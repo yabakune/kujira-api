@@ -28,6 +28,7 @@ export function handleAPIError<Error>(
   ) {
     return prismaErrors(error.code, error.meta?.target);
   } else {
+    console.log(error);
     return "There was an unknown error. If the issue persists, please contact kujira.help@outlook.com";
   }
 }
