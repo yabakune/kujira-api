@@ -106,10 +106,8 @@ export async function updateUserPassword(
     // 				1. The user entered the correct old password.
     // 				2. The user entered a new password that isn't the same as the old password.
 
-    const saltRounds = 10;
-    const encryptedPassword = await bcrypt.hash(
-      request.body.newPassword,
-      saltRounds
+    const encryptedPassword = await Helpers.encryptPassword(
+      request.body.newPassword
     );
     const data: Validators.UserUpdatePasswordValidator = {
       password: encryptedPassword,
