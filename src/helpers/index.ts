@@ -1,1 +1,1 @@
-export * from "./prisma-errors.helpers";
+export * from "./errors.helpers";

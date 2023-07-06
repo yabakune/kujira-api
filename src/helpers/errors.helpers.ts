@@ -21,13 +21,22 @@ function handlePrismaError<ErrorCause>(
 export function generateErrorResponse<Error>(
   error: Error,
   customErrorMessage?: string
-) {
+): { error: string; caption: string } {
+  let errorMessage = "There was an unknown error.";
+
   if (customErrorMessage) {
-    return customErrorMessage;
-  } else if (error instanceof Prisma.PrismaClientKnownRequestError) {
-    if (error.code) return handlePrismaError(error.code, error.meta?.target);
+    errorMessage = customErrorMessage;
+  } else if (
+    error instanceof Prisma.PrismaClientKnownRequestError &&
+    error.code
+  ) {
+    errorMessage = handlePrismaError(error.code, error.meta?.target);
   } else {
     console.log(error);
-    return "There was an unknown error. If the issue persists, please contact kujira.help@outlook.com";
   }
+
+  return {
+    error: errorMessage,
+    caption: "If the issue persists, please contact kujira.help@outlook.com",
+  };
 }
