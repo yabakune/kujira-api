@@ -1,3 +1,4 @@
+import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { Response } from "express";
 import { PrismaClient, User } from "@prisma/client";
@@ -82,7 +83,10 @@ export async function registerNewUserAndEmailVerificationCode(
     return response
       .status(Constants.HttpStatusCodes.BAD_REQUEST)
       .json(
-        Helpers.generateErrorResponse(error, "Failed to register new account.")
+        Helpers.generateErrorResponse(
+          error,
+          "Failed to register new account. Please try again."
+        )
       );
   }
 }
@@ -103,12 +107,73 @@ type EmailVerificationPayload = {
   accessToken: string;
 };
 
-export async function verifyNewUserWithAuthToken(
+export async function verifyRegistrationWithAuthToken(
   email: string
 ): Promise<EmailVerificationPayload> {
   const verifiedUser = await prisma.user.update({
     where: { email },
     data: { verificationCode: null, emailVerified: true },
+  });
+
+  const authSecretKey = process.env.AUTH_SECRET_KEY;
+  if (authSecretKey) {
+    const accessToken = generateAccessToken(
+      verifiedUser.id,
+      authSecretKey,
+      true
+    );
+    return { verifiedUser, accessToken };
+  } else {
+    console.log("AUTH_SECRET_KEY environment variable does not exist.");
+    throw new Error();
+  }
+}
+
+export async function loginUserAndEmailVerificationCode(
+  response: Response,
+  email: string
+) {
+  try {
+    const { verificationCode, decodedVerificationCode } =
+      generateAuthVerificationCodes();
+
+    await prisma.user.update({
+      where: { email },
+      data: { verificationCode },
+    });
+
+    await Helpers.emailUser(email, "Kujira: Confirm Login", [
+      "Welcome back! I missed you :'D",
+      `Please copy and paste the following verification code into the app to verify your registration: ${decodedVerificationCode}`,
+      "If this is a mistake, you can safely ignore this email.",
+    ]);
+
+    return response.status(Constants.HttpStatusCodes.CREATED).json(
+      Helpers.generateTextResponse({
+        title: "Welcome back!",
+        body: "A verification code was sent to your email. Please enter it below.",
+        caption: "Note that your code will expire within 5 minutes.",
+      })
+    );
+  } catch (error) {
+    return response
+      .status(Constants.HttpStatusCodes.BAD_REQUEST)
+      .json(
+        Helpers.generateErrorResponse(
+          error,
+          "Failed to login. Please try again."
+        )
+      );
+  }
+}
+
+export async function verifyLoginWithAuthToken(
+  email: string,
+  thirtyDays?: boolean
+) {
+  const verifiedUser = await prisma.user.update({
+    where: { email },
+    data: { verificationCode: null },
   });
 
   const authSecretKey = process.env.AUTH_SECRET_KEY;

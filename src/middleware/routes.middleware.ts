@@ -19,7 +19,7 @@ type ExpectedClientData = {
   optionalData?: string[];
 };
 
-export function validateClientData(expectedClientData: ExpectedClientData) {
+export function verifyClientData(expectedClientData: ExpectedClientData) {
   return (request: Request, response: Response, next: NextFunction) => {
     const clientData = Object.keys(request.body); // Data sent from the client.
     const { requiredData, optionalData } = expectedClientData;

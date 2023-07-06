@@ -13,7 +13,7 @@ const RequiredRegistrationData: Validators.RequiredRegistrationData = [
 ];
 authRouter.post(
   "/register",
-  Middleware.validateClientData({ requiredData: RequiredRegistrationData }),
+  Middleware.verifyClientData({ requiredData: RequiredRegistrationData }),
   Controllers.register
 );
 
@@ -24,7 +24,7 @@ const requiredVerificationCodeData: Validators.RequiredVerificationCodeData = [
 
 authRouter.post(
   "/verify-registration",
-  Middleware.validateClientData({
+  Middleware.verifyClientData({
     requiredData: requiredVerificationCodeData,
   }),
   Middleware.checkEmailVerified,
@@ -32,19 +32,27 @@ authRouter.post(
   Controllers.verifyRegistration
 );
 
-authRouter.post("/login");
+const requiredLoginData: Validators.RequiredLoginData = ["email", "password"];
+authRouter.post(
+  "/login",
+  Middleware.verifyClientData({ requiredData: requiredLoginData }),
+  Middleware.checkUserExists,
+  Middleware.checkUserEnteredCorrectPassword,
+  Controllers.login
+);
 
 authRouter.post(
   "/verify-login",
-  Middleware.validateClientData({
+  Middleware.verifyClientData({
     requiredData: requiredVerificationCodeData,
+    optionalData: ["thirtyDays"],
   }),
   Middleware.checkSubmittedVerificationCode,
-  Controllers.verifyRegistration
+  Controllers.verifyLogin
 );
 
 authRouter.post(
   "/send-new-verification-code",
-  Middleware.validateClientData({ requiredData: ["email"] }),
+  Middleware.verifyClientData({ requiredData: ["email"] }),
   Controllers.sendNewVerificationCode
 );

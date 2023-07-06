@@ -33,7 +33,7 @@ export async function register(
 }
 
 // ========================================================================================= //
-// [ CHECK VERIFICATION CODE FOR VERIFYING REGISTRATION / LOGIN ] ========================== //
+// [ VERIFY REGISTRATION ] ================================================================= //
 // ========================================================================================= //
 
 export async function verifyRegistration(
@@ -42,7 +42,7 @@ export async function verifyRegistration(
 ) {
   try {
     const { verifiedUser, accessToken } =
-      await Services.verifyNewUserWithAuthToken(request.body.email);
+      await Services.verifyRegistrationWithAuthToken(request.body.email);
 
     const safeUser = Services.generateSafeUser(verifiedUser);
 
@@ -64,6 +64,53 @@ export async function verifyRegistration(
 // ========================================================================================= //
 // [ LOGIN EXISTING USER ] ================================================================= //
 // ========================================================================================= //
+
+export async function login(
+  request: Request<{}, {}, Validators.LoginValidator>,
+  response: Response
+) {
+  try {
+    return Services.loginUserAndEmailVerificationCode(
+      response,
+      request.body.email
+    );
+  } catch (error) {
+    console.log("Auth Register Error:", error);
+    return response
+      .status(Constants.HttpStatusCodes.INTERNAL_SERVER_ERROR)
+      .json(Helpers.generateErrorResponse(error));
+  }
+}
+
+// ========================================================================================= //
+// [ VERIFY LOGIN ] ======================================================================== //
+// ========================================================================================= //
+
+export async function verifyLogin(
+  request: Request<
+    {},
+    {},
+    Validators.VerificationCodeValidator & { thirtyDays?: boolean }
+  >,
+  response: Response
+) {
+  try {
+    const { verifiedUser, accessToken } =
+      await Services.verifyNewUserWithAuthToken(request.body.email);
+
+    const safeUser = Services.generateSafeUser(verifiedUser);
+
+    return response
+      .status(Constants.HttpStatusCodes.OK)
+      .json(
+        Helpers.generateDataResponse({ safeUser, accessToken }, "Logged in!")
+      );
+  } catch (error) {
+    return response
+      .status(Constants.HttpStatusCodes.INTERNAL_SERVER_ERROR)
+      .json(Helpers.generateErrorResponse(error));
+  }
+}
 
 // ========================================================================================= //
 // [ SEND NEW VERIFICATION CODE ] ========================================================== //

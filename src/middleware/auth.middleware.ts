@@ -1,3 +1,4 @@
+import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { NextFunction, Request, Response } from "express";
 import { PrismaClient, User } from "@prisma/client";
@@ -9,10 +10,13 @@ import * as Validators from "@/validators";
 
 const prisma = new PrismaClient();
 
-type UserFromCheckEmailVerified = { userFromCheckEmailVerified?: User };
+type AttachedUserFromPreviousMiddleware = {
+  attachedUserFromPreviousMiddleware?: User;
+};
 
 export async function checkEmailVerified(
-  request: Request<{}, {}, { email: string }> & UserFromCheckEmailVerified,
+  request: Request<{}, {}, { email: string }> &
+    AttachedUserFromPreviousMiddleware,
   response: Response,
   next: NextFunction
 ) {
@@ -24,7 +28,7 @@ export async function checkEmailVerified(
       throw new Error();
     } else {
       // ↓↓↓ Adding our found user to the middleware chain so we don't have to search for it with every step. ↓↓↓ //
-      request.userFromCheckEmailVerified = user;
+      request.attachedUserFromPreviousMiddleware = user;
       return next();
     }
   } catch (error) {
@@ -39,6 +43,63 @@ export async function checkEmailVerified(
   }
 }
 
+export async function checkUserExists(
+  request: Request<{}, {}, { email: string }> &
+    AttachedUserFromPreviousMiddleware,
+  response: Response,
+  next: NextFunction
+) {
+  try {
+    const user = await prisma.user.findUniqueOrThrow({
+      where: { email: request.body.email },
+    });
+    request.attachedUserFromPreviousMiddleware = user;
+    return next();
+  } catch (error) {
+    return response
+      .status(Constants.HttpStatusCodes.BAD_REQUEST)
+      .json(
+        Helpers.generateErrorResponse(
+          error,
+          "A user with that email doesn't exist"
+        )
+      );
+  }
+}
+
+export async function checkUserEnteredCorrectPassword(
+  request: Request<{}, {}, Validators.LoginValidator> &
+    AttachedUserFromPreviousMiddleware,
+  response: Response,
+  next: NextFunction
+) {
+  try {
+    const user =
+      request.attachedUserFromPreviousMiddleware ||
+      (await prisma.user.findUniqueOrThrow({
+        where: { email: request.body.email },
+      }));
+    const passwordsMatch = bcrypt.compareSync(
+      request.body.password,
+      user.password
+    );
+
+    if (passwordsMatch) {
+      return next();
+    } else {
+      return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
+        Helpers.generateTextResponse({
+          body: "Password incorrect. Please enter the correct password",
+        })
+      );
+    }
+  } catch (error) {
+    return response
+      .status(Constants.HttpStatusCodes.BAD_REQUEST)
+      .json(Helpers.generateErrorResponse(error));
+  }
+}
+
 function checkJWTExpired(jsonWebToken: string, secretKey: string): boolean {
   let isExpired = false;
   jwt.verify(jsonWebToken, secretKey, function <Error>(error: Error) {
@@ -49,13 +110,13 @@ function checkJWTExpired(jsonWebToken: string, secretKey: string): boolean {
 
 export async function checkSubmittedVerificationCode(
   request: Request<{}, {}, Validators.VerificationCodeValidator> &
-    UserFromCheckEmailVerified,
+    AttachedUserFromPreviousMiddleware,
   response: Response,
   next: NextFunction
 ) {
   try {
     const user =
-      request.userFromCheckEmailVerified ||
+      request.attachedUserFromPreviousMiddleware ||
       (await prisma.user.findUniqueOrThrow({
         where: { email: request.body.email },
       }));

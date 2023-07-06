@@ -28,6 +28,7 @@ const loginValidator = Prisma.validator<Prisma.UserArgs>()({
   },
 });
 export type LoginValidator = Prisma.UserGetPayload<typeof loginValidator>;
+export type RequiredLoginData = (keyof LoginValidator)[];
 
 // ========================================================================================= //
 // [ VERIFICATION CODE VALIDATOR ] ========================================================= //
