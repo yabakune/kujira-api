@@ -4,17 +4,19 @@ import { PrismaClient } from "@prisma/client";
 import * as Constants from "@/constants";
 import * as Helpers from "@/helpers";
 import * as Services from "@/services";
+import * as Validators from "@/validators";
 
 const prisma = new PrismaClient();
 
 // ========================================================================================= //
-// [ FETCH USERS ] ========================================================================= //
+// [ FETCH All USERS ] ========================================================================= //
 // ========================================================================================= //
 
 export async function getUsers(request: Request, response: Response) {
   try {
     const users = await prisma.user.findMany({ orderBy: { id: "asc" } });
     const safeUsers = Services.generateSafeUsers(users);
+
     return response
       .status(Constants.HttpStatusCodes.OK)
       .json({ response: safeUsers });
@@ -31,7 +33,7 @@ export async function getUsers(request: Request, response: Response) {
 }
 
 // ========================================================================================= //
-// [ FETCH USER ] ========================================================================== //
+// [ FETCH A USER ] ========================================================================== //
 // ========================================================================================= //
 
 export async function getUser(
@@ -43,6 +45,7 @@ export async function getUser(
       where: { id: Number(request.params.userId) },
     });
     const safeUser = Services.generateSafeUser(user);
+
     return response
       .status(Constants.HttpStatusCodes.OK)
       .json({ response: safeUser });
@@ -50,5 +53,41 @@ export async function getUser(
     return response
       .status(Constants.HttpStatusCodes.BAD_REQUEST)
       .json(Helpers.generateErrorResponse(error, "Account does not exist."));
+  }
+}
+
+// ========================================================================================= //
+// [ UPDATE A USER ] =================================================================== //
+// ========================================================================================= //
+
+export async function updateUser(
+  request: Request<{ userId: string }, {}, Validators.UserUpdateValidator>,
+  response: Response
+) {
+  try {
+    const data: Validators.UserUpdateValidator = {
+      email: request.body.email,
+      username: request.body.username,
+      currency: request.body.currency,
+      theme: request.body.theme,
+      mobileNumber: request.body.mobileNumber,
+      emailVerified: request.body.emailVerified,
+      onboarded: request.body.onboarded,
+    };
+
+    const updatedUser = await prisma.user.update({
+      where: { id: Number(request.params.userId) },
+      data,
+    });
+    const safeUser = Services.generateSafeUser(updatedUser);
+
+    return response.status(Constants.HttpStatusCodes.OK).json({
+      response: safeUser,
+      success: "Successfully updated!",
+    });
+  } catch (error) {
+    return response
+      .status(Constants.HttpStatusCodes.BAD_REQUEST)
+      .json(Helpers.generateErrorResponse(error));
   }
 }
