@@ -1,3 +1,4 @@
+import bcrypt from "bcrypt";
 import { Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
 
@@ -83,7 +84,43 @@ export async function updateUser(
 
     return response.status(Constants.HttpStatusCodes.OK).json({
       response: safeUser,
-      success: "Successfully updated!",
+      success: "Account updated!",
+    });
+  } catch (error) {
+    return response
+      .status(Constants.HttpStatusCodes.BAD_REQUEST)
+      .json(Helpers.generateErrorResponse(error));
+  }
+}
+
+// ========================================================================================= //
+// [ UPDATE A USER'S PASSWORD ] =================================================================== //
+// ========================================================================================= //
+
+export async function updateUserPassword(
+  request: Request<{ userId: string }, {}, { newPassword: string }>,
+  response: Response
+) {
+  try {
+    // TODO : There should be a middleware that first checks to make sure that:
+    // 				1. The user entered the correct old password.
+    // 				2. The user entered a new password that isn't the same as the old password.
+
+    const saltRounds = 10;
+    const encryptedPassword = await bcrypt.hash(
+      request.body.newPassword,
+      saltRounds
+    );
+    const data: Validators.UserUpdatePasswordValidator = {
+      password: encryptedPassword,
+    };
+    await prisma.user.update({
+      where: { id: Number(request.params.userId) },
+      data,
+    });
+
+    return response.status(Constants.HttpStatusCodes.OK).json({
+      success: "Password updated!",
     });
   } catch (error) {
     return response
