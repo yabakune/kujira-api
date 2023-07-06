@@ -20,7 +20,7 @@ export async function getUsers(request: Request, response: Response) {
 
     return response
       .status(Constants.HttpStatusCodes.OK)
-      .json({ response: safeUsers });
+      .json(Helpers.generateDataResponse(safeUsers));
   } catch (error) {
     return response
       .status(Constants.HttpStatusCodes.INTERNAL_SERVER_ERROR)
@@ -49,7 +49,7 @@ export async function getUser(
 
     return response
       .status(Constants.HttpStatusCodes.OK)
-      .json({ response: safeUser });
+      .json(Helpers.generateDataResponse(safeUser));
   } catch (error) {
     return response
       .status(Constants.HttpStatusCodes.BAD_REQUEST)
@@ -82,10 +82,9 @@ export async function updateUser(
     });
     const safeUser = Services.generateSafeUser(updatedUser);
 
-    return response.status(Constants.HttpStatusCodes.OK).json({
-      response: safeUser,
-      success: "Account updated!",
-    });
+    return response
+      .status(Constants.HttpStatusCodes.OK)
+      .json(Helpers.generateDataResponse(safeUser, "Account updated!"));
   } catch (error) {
     return response
       .status(Constants.HttpStatusCodes.BAD_REQUEST)
@@ -117,9 +116,9 @@ export async function updateUserPassword(
       data,
     });
 
-    return response.status(Constants.HttpStatusCodes.OK).json({
-      success: "Password updated!",
-    });
+    return response
+      .status(Constants.HttpStatusCodes.OK)
+      .json(Helpers.generateDataResponse(null, "Password updated!"));
   } catch (error) {
     return response
       .status(Constants.HttpStatusCodes.BAD_REQUEST)

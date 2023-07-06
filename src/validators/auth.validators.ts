@@ -5,6 +5,7 @@ const registrationValidator = Prisma.validator<Prisma.UserArgs>()({
     email: true,
     username: true,
     password: true,
+    verificationCode: true,
   },
 });
 export type RegistrationValidator = Prisma.UserGetPayload<

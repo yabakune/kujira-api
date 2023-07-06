@@ -1,5 +1,31 @@
 import { Prisma } from "@prisma/client";
 
+type DataResponse<Response> = {
+  response: Response;
+  success?: string;
+};
+
+export function generateDataResponse<Response>(
+  response: Response,
+  success?: string
+): DataResponse<Response> {
+  return { response, success };
+}
+
+export type TextResponse = {
+  title: string;
+  body?: string;
+  caption?: string;
+};
+
+export function generateTextResponse(
+  title: string,
+  body?: string,
+  caption?: string
+): TextResponse {
+  return { title, body, caption };
+}
+
 function handlePrismaError<ErrorCause>(
   errorCode: string,
   errorCause?: ErrorCause
@@ -42,6 +68,6 @@ export function generateErrorResponse<Error>(
 
   return {
     error: errorMessage,
-    caption: "If the issue persists, please contact kujira.help@outlook.com",
+    caption: "If the issue persists, please contact kujira.help@outlook.com.",
   };
 }
