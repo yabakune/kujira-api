@@ -24,11 +24,8 @@ export function generateErrorResponse<Error>(
 ) {
   if (customErrorMessage) {
     return customErrorMessage;
-  } else if (
-    error instanceof Prisma.PrismaClientKnownRequestError &&
-    error.code
-  ) {
-    return handlePrismaError(error.code, error.meta?.target);
+  } else if (error instanceof Prisma.PrismaClientKnownRequestError) {
+    if (error.code) return handlePrismaError(error.code, error.meta?.target);
   } else {
     console.log(error);
     return "There was an unknown error. If the issue persists, please contact kujira.help@outlook.com";
