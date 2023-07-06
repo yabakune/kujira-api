@@ -10,6 +10,8 @@ import dotenv from "dotenv";
 import helmet from "helmet";
 import { rateLimit } from "express-rate-limit";
 
+import * as Routes from "@/routes";
+
 dotenv.config();
 const app = express();
 
@@ -39,10 +41,12 @@ enum RouteBases {
   PURCHASES = "/api/v1/purchases",
   BUG_REPORTS = "/api/v1/bug-reports",
 }
+app.use(RouteBases.USERS, Routes.usersRouter);
 
+// ↓↓↓ Fallback in case I forgot to catch an error somewhere. ↓↓↓ //
 const errorFallbackMiddleware: ErrorRequestHandler = (
   error: Error,
-  request: Request,
+  _: Request,
   response: Response,
   next: NextFunction
 ) => {
@@ -50,7 +54,7 @@ const errorFallbackMiddleware: ErrorRequestHandler = (
 };
 app.use(errorFallbackMiddleware);
 
-const port = process.env.PORT;
+const port = process.env.PORT || 8000;
 app.listen(port, () => {
   console.log(
     `🚀 Success! CORS-enabled web server is running at https://localhost:${port}`
