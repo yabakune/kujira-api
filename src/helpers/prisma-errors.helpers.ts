@@ -1,6 +1,6 @@
 import { Prisma } from "@prisma/client";
 
-function prismaErrors<ErrorCause>(
+function handlePrismaError<ErrorCause>(
   errorCode: string,
   errorCause?: ErrorCause
 ): string {
@@ -8,7 +8,9 @@ function prismaErrors<ErrorCause>(
     case "P1000":
       return "Authentication failed. Please provide credentials to access.";
     case "P2002":
-      return `Provided ${errorCause} not available.`;
+      return errorCause
+        ? `Provided ${errorCause} not available.`
+        : "The input you provided already exists.";
     case "P2025":
       return "Record not found";
     default:
@@ -16,7 +18,7 @@ function prismaErrors<ErrorCause>(
   }
 }
 
-export function handleAPIError<Error>(
+export function generateErrorResponse<Error>(
   error: Error,
   customErrorMessage?: string
 ) {
@@ -26,7 +28,7 @@ export function handleAPIError<Error>(
     error instanceof Prisma.PrismaClientKnownRequestError &&
     error.code
   ) {
-    return prismaErrors(error.code, error.meta?.target);
+    return handlePrismaError(error.code, error.meta?.target);
   } else {
     console.log(error);
     return "There was an unknown error. If the issue persists, please contact kujira.help@outlook.com";

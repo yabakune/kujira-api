@@ -40,7 +40,7 @@ export async function getUser(
     return response.status(HttpStatusCodes.OK).json({ response: safeUser });
   } catch (error) {
     return response.status(HttpStatusCodes.BAD_REQUEST).json({
-      error: Helpers.handleAPIError(error, "User does not exist."),
+      error: Helpers.generateErrorResponse(error, "Account does not exist."),
     });
   }
 }
