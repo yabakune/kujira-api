@@ -11,6 +11,7 @@ const registrationValidator = Prisma.validator<Prisma.UserArgs>()({
 export type RegistrationValidator = Prisma.UserGetPayload<
   typeof registrationValidator
 >;
+export type RequiredRegistrationData = (keyof RegistrationValidator)[];
 
 const verifyRegistrationValidator = Prisma.validator<Prisma.UserArgs>()({
   select: { verificationCode: true },
