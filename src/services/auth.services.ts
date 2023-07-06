@@ -1,10 +1,10 @@
 import jwt from "jsonwebtoken";
+import { Response } from "express";
 import { PrismaClient, User } from "@prisma/client";
 
 import * as Constants from "@/constants";
 import * as Helpers from "@/helpers";
 import * as Validators from "@/validators";
-import { Response } from "express";
 
 const prisma = new PrismaClient();
 
@@ -88,18 +88,40 @@ export async function registerNewUserAndEmailVerificationCode(
   }
 }
 
-export async function verifyNewUser(email: string) {
+export function generateAccessToken(
+  userId: number,
+  authSecretKey: string,
+  thirtyDayExpiration: boolean = false
+) {
+  const accessToken = jwt.sign({ _id: userId.toString() }, authSecretKey, {
+    expiresIn: thirtyDayExpiration ? "30 days" : "7 days",
+  });
+  return accessToken;
+}
+
+type EmailVerificationPayload = {
+  verifiedUser: User;
+  accessToken: string;
+};
+
+export async function verifyNewUserWithAuthToken(
+  email: string
+): Promise<EmailVerificationPayload> {
   const verifiedUser = await prisma.user.update({
     where: { email },
     data: { verificationCode: null, emailVerified: true },
   });
-  return verifiedUser;
-}
 
-// function checkJWTExpired(jsonWebToken: string, secretKey: string): boolean {
-//   let isExpired = false;
-//   jwt.verify(jsonWebToken, secretKey, function <Error>(error: Error) {
-//     if (error) isExpired = true;
-//   });
-//   return isExpired;
-// }
+  const authSecretKey = process.env.AUTH_SECRET_KEY;
+  if (authSecretKey) {
+    const accessToken = generateAccessToken(
+      verifiedUser.id,
+      authSecretKey,
+      true
+    );
+    return { verifiedUser, accessToken };
+  } else {
+    console.log("AUTH_SECRET_KEY environment variable does not exist.");
+    throw new Error();
+  }
+}

@@ -18,8 +18,6 @@ export async function register(
       request.body.password
     );
 
-    console.log("encryptedPassword:", encryptedPassword);
-
     return Services.registerNewUserAndEmailVerificationCode(
       response,
       request.body.email,
@@ -43,15 +41,17 @@ export async function verifyRegistration(
   response: Response
 ) {
   try {
-    const verifiedUser = await Services.verifyNewUser(request.body.email);
+    const { verifiedUser, accessToken } =
+      await Services.verifyNewUserWithAuthToken(request.body.email);
+
     const safeUser = Services.generateSafeUser(verifiedUser);
 
     return response
       .status(Constants.HttpStatusCodes.OK)
       .json(
         Helpers.generateDataResponse(
-          safeUser,
-          "Email verified! Thank you again for joining Kujira. I hope you enjoy using it :)"
+          { safeUser, accessToken },
+          "Email verified!"
         )
       );
   } catch (error) {

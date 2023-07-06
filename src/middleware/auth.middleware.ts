@@ -1,3 +1,4 @@
+import jwt from "jsonwebtoken";
 import { NextFunction, Request, Response } from "express";
 import { PrismaClient, User } from "@prisma/client";
 
@@ -21,6 +22,7 @@ export async function checkEmailVerified(
     if (user.emailVerified) {
       throw new Error();
     } else {
+      // ↓↓↓ Adding our found user to the middleware chain so we don't have to search for it with every step. ↓↓↓ //
       request.userFromCheckEmailVerified = user;
       return next();
     }
@@ -36,6 +38,14 @@ export async function checkEmailVerified(
   }
 }
 
+function checkJWTExpired(jsonWebToken: string, secretKey: string): boolean {
+  let isExpired = false;
+  jwt.verify(jsonWebToken, secretKey, function <Error>(error: Error) {
+    if (error) isExpired = true;
+  });
+  return isExpired;
+}
+
 export async function checkSubmittedVerificationCode(
   request: Request<{}, {}, Validators.VerificationCodeValidator> &
     UserFromCheckEmailVerified,
@@ -49,15 +59,40 @@ export async function checkSubmittedVerificationCode(
         where: { email: request.body.email },
       }));
 
-    if (user.verificationCode === request.body.verificationCode) {
-      return next();
+    if (!user.verificationCode) {
+      return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
+        Helpers.generateTextResponse({
+          title: "Account does not have a verification code.",
+          body: "Please log in or request a new verification code.",
+        })
+      );
     } else {
-      request.userFromCheckEmailVerified = user;
-      throw new Error();
+      const secretKey = process.env.VERIFICATION_CODE_SECRET_KEY;
+      if (!secretKey) {
+        throw new Error();
+      } else if (checkJWTExpired(user.verificationCode, secretKey)) {
+        return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
+          Helpers.generateTextResponse({
+            body: "Verification code expired. Please request a new verification code.",
+          })
+        );
+      } else if (user.verificationCode !== request.body.verificationCode) {
+        return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
+          Helpers.generateTextResponse({
+            body: "Invalid verification code. Please supply the correct code.",
+          })
+        );
+      } else {
+        return next();
+      }
     }
   } catch (error) {
+    console.log(
+      "VERIFICATION_CODE_SECRET_KEY environment variable MAY not exist."
+    );
+    console.log("checkSubmittedVerificationCode() Error:", error);
     return response
-      .status(Constants.HttpStatusCodes.BAD_REQUEST)
-      .json(Helpers.generateErrorResponse(error, "Invalid verification code."));
+      .status(Constants.HttpStatusCodes.INTERNAL_SERVER_ERROR)
+      .json(Helpers.generateErrorResponse(error));
   }
 }
