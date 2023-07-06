@@ -20,7 +20,7 @@ function generateVerificationCode(secretKey: string): string {
 }
 
 type Decoded = { code: string } & jwt.JwtPayload;
-function decodeVerificationCode(
+export function decodeVerificationCode(
   verificationCode: string,
   secretKey: string
 ): string {
@@ -41,9 +41,7 @@ function generateAuthVerificationCodes() {
     console.log(
       "VERIFICATION_CODE_SECRET_KEY environment variable does not exist."
     );
-    throw new Error(
-      "There was an error creating your account. Please try again. If the issue persists, please contact kujira.help@outlook.com."
-    );
+    throw new Error();
   }
 }
 
@@ -123,5 +121,32 @@ export async function verifyNewUserWithAuthToken(
   } else {
     console.log("AUTH_SECRET_KEY environment variable does not exist.");
     throw new Error();
+  }
+}
+
+export async function updateAndEmailUserWithNewVerificationCode(
+  response: Response,
+  email: string
+) {
+  try {
+    const { verificationCode, decodedVerificationCode } =
+      generateAuthVerificationCodes();
+
+    const userWithNewVerificationCode = await prisma.user.update({
+      where: { email },
+      data: { verificationCode: verificationCode },
+    });
+
+    await Helpers.emailUser(email, "Kujira: New Verification Code", [
+      "This email is in response to your request for a new verification code.",
+      `Please copy and paste the following verification code into the app to verify your account: ${decodedVerificationCode}`,
+      "If this is a mistake, you can safely ignore this email.",
+    ]);
+
+    return userWithNewVerificationCode;
+  } catch (error) {
+    return response
+      .status(Constants.HttpStatusCodes.BAD_REQUEST)
+      .json(Helpers.generateErrorResponse(error));
   }
 }

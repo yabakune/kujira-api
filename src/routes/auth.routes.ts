@@ -43,4 +43,8 @@ authRouter.post(
   Controllers.verifyRegistration
 );
 
-authRouter.post("/resend-verification-code");
+authRouter.post(
+  "/send-new-verification-code",
+  Middleware.validateClientData({ requiredData: ["email"] }),
+  Controllers.sendNewVerificationCode
+);

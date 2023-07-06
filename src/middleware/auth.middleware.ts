@@ -4,6 +4,7 @@ import { PrismaClient, User } from "@prisma/client";
 
 import * as Constants from "@/constants";
 import * as Helpers from "@/helpers";
+import * as Services from "@/services";
 import * as Validators from "@/validators";
 
 const prisma = new PrismaClient();
@@ -76,7 +77,10 @@ export async function checkSubmittedVerificationCode(
             body: "Verification code expired. Please request a new verification code.",
           })
         );
-      } else if (user.verificationCode !== request.body.verificationCode) {
+      } else if (
+        Services.decodeVerificationCode(user.verificationCode, secretKey) !==
+        request.body.verificationCode
+      ) {
         return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
           Helpers.generateTextResponse({
             body: "Invalid verification code. Please supply the correct code.",

@@ -66,5 +66,36 @@ export async function verifyRegistration(
 // ========================================================================================= //
 
 // ========================================================================================= //
-// [ RESEND VERIFICATION CODE ] ============================================================ //
+// [ SEND NEW VERIFICATION CODE ] ========================================================== //
 // ========================================================================================= //
+
+export async function sendNewVerificationCode(
+  request: Request<{}, {}, { email: string }>,
+  response: Response
+) {
+  try {
+    const userWithNewVerificationCode =
+      await Services.updateAndEmailUserWithNewVerificationCode(
+        response,
+        request.body.email
+      );
+
+    return response
+      .status(Constants.HttpStatusCodes.OK)
+      .json(
+        Helpers.generateDataResponse(
+          userWithNewVerificationCode,
+          "New verification code sent! Please check your email."
+        )
+      );
+  } catch (error) {
+    return response
+      .status(Constants.HttpStatusCodes.BAD_REQUEST)
+      .json(
+        Helpers.generateErrorResponse(
+          error,
+          "Failed to create new registration code. Please refresh the page and try again."
+        )
+      );
+  }
+}
