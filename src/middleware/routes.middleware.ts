@@ -7,7 +7,11 @@ function generateMissingClientData(
   clientData: string[],
   expectedData: string[]
 ) {
-  return clientData.filter((data: string) => !expectedData.includes(data));
+  const missingClientData = expectedData.filter(
+    (data: string) => !clientData.includes(data)
+  );
+
+  return missingClientData;
 }
 
 type ExpectedClientData = {
@@ -29,21 +33,17 @@ export function validateClientData(expectedClientData: ExpectedClientData) {
       : [];
 
     if (missingRequiredData.length > 0) {
-      return response
-        .status(Constants.HttpStatusCodes.BAD_REQUEST)
-        .json(
-          Helpers.generateTextResponse(
-            `Missing Data: ${missingRequiredData.join(", ")}.`
-          )
-        );
+      return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
+        Helpers.generateTextResponse({
+          body: `Missing Data: ${missingRequiredData.join(", ")}.`,
+        })
+      );
     } else if (missingOptionalData.length > 0) {
-      return response
-        .status(Constants.HttpStatusCodes.BAD_REQUEST)
-        .json(
-          Helpers.generateTextResponse(
-            `Missing Data: ${missingOptionalData.join(", ")}.`
-          )
-        );
+      return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
+        Helpers.generateTextResponse({
+          body: `Missing Data: ${missingOptionalData.join(", ")}.`,
+        })
+      );
     } else {
       return next();
     }

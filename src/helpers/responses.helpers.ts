@@ -13,17 +13,13 @@ export function generateDataResponse<Response>(
 }
 
 export type TextResponse = {
-  title: string;
-  body?: string;
+  title?: string;
+  body: string;
   caption?: string;
 };
 
-export function generateTextResponse(
-  title: string,
-  body?: string,
-  caption?: string
-): TextResponse {
-  return { title, body, caption };
+export function generateTextResponse(textResponse: TextResponse): TextResponse {
+  return textResponse;
 }
 
 function handlePrismaError<ErrorCause>(
@@ -63,7 +59,7 @@ export function generateErrorResponse<Error>(
   ) {
     errorMessage = handlePrismaError(error.code, error.meta?.target);
   } else {
-    console.log(error);
+    console.log("generateErrorResponse() Fallback:", error);
   }
 
   return {

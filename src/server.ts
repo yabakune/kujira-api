@@ -42,6 +42,7 @@ enum RouteBases {
   PURCHASES = "/api/v1/purchases",
   BUG_REPORTS = "/api/v1/bug-reports",
 }
+app.use(RouteBases.AUTH, Routes.authRouter);
 app.use(RouteBases.USERS, Routes.usersRouter);
 
 // ↓↓↓ Fallback in case I forgot to catch an error somewhere. ↓↓↓ //

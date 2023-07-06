@@ -44,7 +44,7 @@ export async function emailUser(
     prodSMTPtransporter.sendMail(
       message,
       function (error: any, information: any) {
-        if (error) console.log(error);
+        if (error) console.log("Email Error:", error);
         else console.log("Sent Response:", information.response);
       }
     );
