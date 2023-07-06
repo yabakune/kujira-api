@@ -8,3 +8,4 @@ usersRouter.get("/", Controllers.getUsers);
 usersRouter.get("/:userId", Controllers.getUser);
 usersRouter.patch("/:userId", Controllers.updateUser);
 usersRouter.patch("/:userId/update-password", Controllers.updateUserPassword);
+usersRouter.delete("/:userId", Controllers.deleteUser);

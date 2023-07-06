@@ -9,7 +9,7 @@ import * as Validators from "@/validators";
 const prisma = new PrismaClient();
 
 // ========================================================================================= //
-// [ FETCH All USERS ] ========================================================================= //
+// [ FETCH All USERS ] ===================================================================== //
 // ========================================================================================= //
 
 export async function getUsers(request: Request, response: Response) {
@@ -33,7 +33,7 @@ export async function getUsers(request: Request, response: Response) {
 }
 
 // ========================================================================================= //
-// [ FETCH A USER ] ========================================================================== //
+// [ FETCH A USER ] ======================================================================== //
 // ========================================================================================= //
 
 export async function getUser(
@@ -57,7 +57,7 @@ export async function getUser(
 }
 
 // ========================================================================================= //
-// [ UPDATE A USER ] =================================================================== //
+// [ UPDATE A USER ] ======================================================================= //
 // ========================================================================================= //
 
 export async function updateUser(
@@ -92,7 +92,7 @@ export async function updateUser(
 }
 
 // ========================================================================================= //
-// [ UPDATE A USER'S PASSWORD ] =================================================================== //
+// [ UPDATE A USER'S PASSWORD ] ============================================================ //
 // ========================================================================================= //
 
 export async function updateUserPassword(
@@ -122,5 +122,27 @@ export async function updateUserPassword(
     return response
       .status(Constants.HttpStatusCodes.BAD_REQUEST)
       .json(Helpers.generateErrorResponse(error));
+  }
+}
+
+// ========================================================================================= //
+// [ DELETE A USER ] ======================================================================= //
+// ========================================================================================= //
+
+export async function deleteUser(
+  request: Request<{ userId: string }>,
+  response: Response
+) {
+  try {
+    const { id } = await prisma.user.delete({
+      where: { id: Number(request.params.userId) },
+    });
+    return response
+      .status(Constants.HttpStatusCodes.NO_CONTENT)
+      .json(Helpers.generateDataResponse(id, "Account deleted!"));
+  } catch (error) {
+    return response
+      .status(Constants.HttpStatusCodes.BAD_REQUEST)
+      .json(Helpers.generateErrorResponse(error, "Account does not exist."));
   }
 }
