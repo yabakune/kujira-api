@@ -74,17 +74,16 @@ export async function sendNewVerificationCode(
   response: Response
 ) {
   try {
-    const userWithNewVerificationCode =
-      await Services.updateAndEmailUserWithNewVerificationCode(
-        response,
-        request.body.email
-      );
+    const safeUser = await Services.updateAndEmailUserWithNewVerificationCode(
+      response,
+      request.body.email
+    );
 
     return response
       .status(Constants.HttpStatusCodes.OK)
       .json(
         Helpers.generateDataResponse(
-          userWithNewVerificationCode,
+          safeUser,
           "New verification code sent! Please check your email."
         )
       );

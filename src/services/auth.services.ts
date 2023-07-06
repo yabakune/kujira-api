@@ -4,6 +4,7 @@ import { PrismaClient, User } from "@prisma/client";
 
 import * as Constants from "@/constants";
 import * as Helpers from "@/helpers";
+import * as Services from "@/services";
 import * as Validators from "@/validators";
 
 const prisma = new PrismaClient();
@@ -137,13 +138,15 @@ export async function updateAndEmailUserWithNewVerificationCode(
       data: { verificationCode: verificationCode },
     });
 
+    const safeUser = Services.generateSafeUser(userWithNewVerificationCode);
+
     await Helpers.emailUser(email, "Kujira: New Verification Code", [
       "This email is in response to your request for a new verification code.",
       `Please copy and paste the following verification code into the app to verify your account: ${decodedVerificationCode}`,
       "If this is a mistake, you can safely ignore this email.",
     ]);
 
-    return userWithNewVerificationCode;
+    return safeUser;
   } catch (error) {
     return response
       .status(Constants.HttpStatusCodes.BAD_REQUEST)
