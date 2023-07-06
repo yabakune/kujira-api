@@ -1,4 +1,3 @@
-import bcrypt from "bcrypt";
 import { Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
 

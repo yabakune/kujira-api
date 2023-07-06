@@ -20,13 +20,13 @@ export function decodeVerificationCode(
   return code;
 }
 
-function checkJWTExpired(jsonWebToken: string, secretKey: string): boolean {
-  let isExpired = false;
-  jwt.verify(jsonWebToken, secretKey, function <Error>(error: Error) {
-    if (error) isExpired = true;
-  });
-  return isExpired;
-}
+// function checkJWTExpired(jsonWebToken: string, secretKey: string): boolean {
+//   let isExpired = false;
+//   jwt.verify(jsonWebToken, secretKey, function <Error>(error: Error) {
+//     if (error) isExpired = true;
+//   });
+//   return isExpired;
+// }
 
 export function generateVerificationCodes() {
   const secretKey = process.env.VERIFICATION_CODE_SECRET_KEY;

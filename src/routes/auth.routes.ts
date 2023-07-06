@@ -4,8 +4,8 @@ import * as Controllers from "@/controllers/auth.controllers";
 
 export const authRouter = express.Router();
 
-authRouter.post("/register");
+authRouter.post("/register", Controllers.register);
 authRouter.post("/verify-registration");
 authRouter.post("/:userId/login");
 authRouter.post("/:userId/verify-login");
-authRouter.post("/:userId/resend-verification-code");
+authRouter.post("/resend-verification-code");

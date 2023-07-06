@@ -21,6 +21,8 @@ export async function register(
       request.body.password
     );
 
+    console.log("encryptedPassword:", encryptedPassword);
+
     const { verificationCode, userCode } = Services.generateVerificationCodes();
 
     const data: Validators.RegistrationValidator = {
@@ -67,4 +69,8 @@ export async function register(
 
 // ========================================================================================= //
 // [ VERIFY LOGIN ] ======================================================================== //
+// ========================================================================================= //
+
+// ========================================================================================= //
+// [ RESEND VERIFICATION CODE ] ============================================================ //
 // ========================================================================================= //
