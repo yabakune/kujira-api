@@ -9,3 +9,120 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+enum Theme {
+  dark
+  light
+  system
+  auto
+}
+
+enum Currency {
+  USD
+}
+
+model User {
+  id               Int         @id @default(autoincrement())
+  email            String      @unique
+  username         String      @unique @db.VarChar(16)
+  password         String
+  currency         Currency    @default(USD)
+  theme            Theme       @default(dark)
+  mobileNumber     String?
+  verificationCode String?
+  emailVerified    Boolean     @default(false)
+  onboarded        Boolean     @default(false)
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+  // One To One
+  profile          Profile?
+  // Has Many
+  overviews        Overview[]
+  logbooks         Logbook[]
+  bugReports       BugReport[]
+}
+
+model Profile {
+  id        Int       @id @default(autoincrement())
+  firstName String?
+  lastName  String?
+  birthday  DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  // Belongs To
+  owner     User      @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId   Int       @unique
+}
+
+model Overview {
+  id        Int      @id @default(autoincrement())
+  income    Float
+  savings   Float    @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  // Belongs To
+  owner     User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId   Int      @unique
+  // Has Many
+  entries   Entry[]
+}
+
+model Logbook {
+  id        Int      @id @default(autoincrement())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  // Belongs to
+  owner     User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId   Int
+  // Has Many
+  entries   Entry[]
+}
+
+model Entry {
+  id         Int        @id @default(autoincrement())
+  name       String
+  totalSpent Float      @default(0)
+  budget     Float?
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  // Belongs To
+  overview   Overview?  @relation(fields: [overviewId], references: [id], onDelete: Cascade)
+  overviewId Int?
+  logbook    Logbook?   @relation(fields: [logbookId], references: [id], onDelete: Cascade)
+  logbookId  Int?
+  // Has Many
+  purchases  Purchase[]
+}
+
+enum Category {
+  monthly
+  need
+  planned
+  impulse
+  regret
+}
+
+model Purchase {
+  id          Int      @id @default(autoincrement())
+  placement   Int
+  category    Category
+  description String   @default("")
+  cost        Float?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  // Belongs To
+  entry       Entry    @relation(fields: [entryId], references: [id], onDelete: Cascade)
+  entryId     Int
+}
+
+model BugReport {
+  id        Int      @id @default(autoincrement())
+  issue     String
+  details   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  // Belongs To
+  owner     User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId   Int
+}
