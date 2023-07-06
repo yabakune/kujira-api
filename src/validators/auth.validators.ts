@@ -1,5 +1,9 @@
 import { Prisma } from "@prisma/client";
 
+// ========================================================================================= //
+// [ REGISTRATION VALIDATOR ] ============================================================== //
+// ========================================================================================= //
+
 const registrationValidator = Prisma.validator<Prisma.UserArgs>()({
   select: {
     email: true,
@@ -13,9 +17,9 @@ export type RegistrationValidator = Prisma.UserGetPayload<
 >;
 export type RequiredRegistrationData = (keyof RegistrationValidator)[];
 
-const verifyRegistrationValidator = Prisma.validator<Prisma.UserArgs>()({
-  select: { verificationCode: true },
-});
+// ========================================================================================= //
+// [ LOGIN VALIDATOR ] ===================================================================== //
+// ========================================================================================= //
 
 const loginValidator = Prisma.validator<Prisma.UserArgs>()({
   select: {
@@ -25,6 +29,14 @@ const loginValidator = Prisma.validator<Prisma.UserArgs>()({
 });
 export type LoginValidator = Prisma.UserGetPayload<typeof loginValidator>;
 
-const verifyLoginValidator = Prisma.validator<Prisma.UserArgs>()({
-  select: { verificationCode: true },
+// ========================================================================================= //
+// [ VERIFICATION CODE VALIDATOR ] ========================================================= //
+// ========================================================================================= //
+
+const verificationCodeValidator = Prisma.validator<Prisma.UserArgs>()({
+  select: { email: true, verificationCode: true },
 });
+export type VerificationCodeValidator = Prisma.UserGetPayload<
+  typeof verificationCodeValidator
+>;
+export type RequiredVerificationCodeData = (keyof VerificationCodeValidator)[];

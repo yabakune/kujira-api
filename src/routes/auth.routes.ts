@@ -17,10 +17,30 @@ authRouter.post(
   Controllers.register
 );
 
-authRouter.post("/verify-registration");
+const requiredVerificationCodeData: Validators.RequiredVerificationCodeData = [
+  "email",
+  "verificationCode",
+];
 
-authRouter.post("/:userId/login");
+authRouter.post(
+  "/verify-registration",
+  Middleware.validateClientData({
+    requiredData: requiredVerificationCodeData,
+  }),
+  Middleware.checkEmailVerified,
+  Middleware.checkSubmittedVerificationCode,
+  Controllers.verifyRegistration
+);
 
-authRouter.post("/:userId/verify-login");
+authRouter.post("/login");
+
+authRouter.post(
+  "/verify-login",
+  Middleware.validateClientData({
+    requiredData: requiredVerificationCodeData,
+  }),
+  Middleware.checkSubmittedVerificationCode,
+  Controllers.verifyRegistration
+);
 
 authRouter.post("/resend-verification-code");

@@ -35,15 +35,34 @@ export async function register(
 }
 
 // ========================================================================================= //
-// [ VERIFY REGISTRATION ] ================================================================= //
+// [ CHECK VERIFICATION CODE FOR VERIFYING REGISTRATION / LOGIN ] ========================== //
 // ========================================================================================= //
+
+export async function verifyRegistration(
+  request: Request<{}, {}, Validators.VerificationCodeValidator>,
+  response: Response
+) {
+  try {
+    const verifiedUser = await Services.verifyNewUser(request.body.email);
+    const safeUser = Services.generateSafeUser(verifiedUser);
+
+    return response
+      .status(Constants.HttpStatusCodes.OK)
+      .json(
+        Helpers.generateDataResponse(
+          safeUser,
+          "Email verified! Thank you again for joining Kujira. I hope you enjoy using it :)"
+        )
+      );
+  } catch (error) {
+    return response
+      .status(Constants.HttpStatusCodes.INTERNAL_SERVER_ERROR)
+      .json(Helpers.generateErrorResponse(error));
+  }
+}
 
 // ========================================================================================= //
 // [ LOGIN EXISTING USER ] ================================================================= //
-// ========================================================================================= //
-
-// ========================================================================================= //
-// [ VERIFY LOGIN ] ======================================================================== //
 // ========================================================================================= //
 
 // ========================================================================================= //

@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, User } from "@prisma/client";
 
 import * as Constants from "@/constants";
 import * as Helpers from "@/helpers";
@@ -86,6 +86,14 @@ export async function registerNewUserAndEmailVerificationCode(
         Helpers.generateErrorResponse(error, "Failed to register new account.")
       );
   }
+}
+
+export async function verifyNewUser(email: string) {
+  const verifiedUser = await prisma.user.update({
+    where: { email },
+    data: { verificationCode: null, emailVerified: true },
+  });
+  return verifiedUser;
 }
 
 // function checkJWTExpired(jsonWebToken: string, secretKey: string): boolean {
