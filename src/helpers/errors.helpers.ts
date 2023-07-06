@@ -18,10 +18,15 @@ function handlePrismaError<ErrorCause>(
   }
 }
 
+type ErrorResponse = {
+  error: string;
+  caption: string;
+};
+
 export function generateErrorResponse<Error>(
   error: Error,
   customErrorMessage?: string
-): { error: string; caption: string } {
+): ErrorResponse {
   let errorMessage = "There was an unknown error.";
 
   if (customErrorMessage) {
