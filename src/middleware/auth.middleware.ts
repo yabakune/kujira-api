@@ -11,7 +11,7 @@ import * as Validators from "@/validators";
 
 const prisma = new PrismaClient();
 
-export async function validateAccountExistsForRegistration(
+export async function validateAccountDoesNotExist(
   request: Request<{}, {}, { email: string }>,
   response: Response,
   next: NextFunction
@@ -38,7 +38,7 @@ export async function validateAccountExistsForRegistration(
   }
 }
 
-export async function validateAccountExistsForLogin(
+export async function validateAccountExists(
   request: Request<{}, {}, { email: string }> &
     Types.AttachedUserFromPreviousMiddleware,
   response: Response,
