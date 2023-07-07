@@ -16,7 +16,7 @@ function excludeFieldFromUsersObject<User, Field extends keyof User>(
   });
   return users;
 }
-export function generateSafeUsers(users: User[]) {
+function generateSafeUsers(users: User[]) {
   return excludeFieldFromUsersObject(users, ["password", "verificationCode"]);
 }
 
