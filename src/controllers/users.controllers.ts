@@ -85,7 +85,7 @@ export async function updateUser(
   } catch (error) {
     return response
       .status(Constants.HttpStatusCodes.BAD_REQUEST)
-      .json(Helpers.generateErrorResponse(error));
+      .json(Helpers.generateErrorResponse(error, "Account does not exist."));
   }
 }
 
