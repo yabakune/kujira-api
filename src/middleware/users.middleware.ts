@@ -1,11 +1,11 @@
 import bcrypt from "bcrypt";
 import { NextFunction, Request, Response } from "express";
+import { PrismaClient, User } from "@prisma/client";
 
 import * as Constants from "@/constants";
 import * as Helpers from "@/helpers";
 import * as Types from "@/types";
 import * as Validators from "@/validators";
-import { PrismaClient, User } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
