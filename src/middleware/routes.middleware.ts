@@ -49,7 +49,7 @@ function generateMissingRequiredData(
   requiredData?: string[]
 ) {
   if (requiredData) {
-    const missingClientData = requiredData?.filter(
+    const missingClientData = requiredData.filter(
       (data: string) => !suppliedClientPayload.includes(data)
     );
     return missingClientData;
