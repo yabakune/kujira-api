@@ -11,7 +11,34 @@ import * as Validators from "@/validators";
 
 const prisma = new PrismaClient();
 
-export async function validateUserExists(
+export async function validateAccountExistsForRegistration(
+  request: Request<{}, {}, { email: string }>,
+  response: Response,
+  next: NextFunction
+) {
+  try {
+    const user = await prisma.user.findUnique({
+      where: { email: request.body.email },
+    });
+    
+    if (user) {
+      throw new Error();
+    } else {
+      return next();
+    }
+  } catch (error) {
+    return response
+      .status(Constants.HttpStatusCodes.BAD_REQUEST)
+      .json(
+        Helpers.generateErrorResponse(
+          error,
+          "An account with that email already exists."
+        )
+      );
+  }
+}
+
+export async function validateAccountExistsForLogin(
   request: Request<{}, {}, { email: string }> &
     Types.AttachedUserFromPreviousMiddleware,
   response: Response,
@@ -21,6 +48,7 @@ export async function validateUserExists(
     const user = await prisma.user.findUniqueOrThrow({
       where: { email: request.body.email },
     });
+
     request.attachedUserFromPreviousMiddleware = user;
     return next();
   } catch (error) {
@@ -29,7 +57,7 @@ export async function validateUserExists(
       .json(
         Helpers.generateErrorResponse(
           error,
-          "A user with that email doesn't exist."
+          "An account with that email doesn't exist."
         )
       );
   }
@@ -66,6 +94,10 @@ export async function validateUserEnteredCorrectPassword(
       );
   }
 }
+
+// ========================================================================================= //
+// [ VALIDATING WHETHER THE USER ALREADY HAS A VERIFIED EMAIL ] ============================ //
+// ========================================================================================= //
 
 function handleEmailCheck(
   request: Request<{}, {}, { email: string }> &
@@ -111,6 +143,13 @@ export async function validateEmailVerified(
       .json(Helpers.generateErrorResponse(error));
   }
 }
+
+// ========================================================================================= //
+// [ VALIDATING IF...  ] =================================================================== //
+// [ 1. THE USER HAS A VERIFICATION CODE IN THE FIRST PLACE.  ] ============================ //
+// [ 2. CHECKING IF THEIR VERIFICATION CODE HAS EXPIRED.      ] ============================ //
+// [ 3. CHECKING IF THE USER SUPPLIED THE CORRECT CODE.       ] ============================ //
+// ========================================================================================= //
 
 function checkIfUserProvidedIncorrectVerificationCode(
   response: Response,

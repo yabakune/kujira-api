@@ -14,6 +14,7 @@ const RequiredRegistrationData: Validators.RequiredRegistrationData = [
 authRouter.post(
   "/register",
   Middleware.verifyClientPayload({ requiredData: RequiredRegistrationData }),
+  Middleware.validateAccountExistsForRegistration,
   Controllers.register
 );
 
@@ -21,7 +22,7 @@ const requiredLoginData: Validators.RequiredLoginData = ["email", "password"];
 authRouter.post(
   "/login",
   Middleware.verifyClientPayload({ requiredData: requiredLoginData }),
-  Middleware.validateUserExists,
+  Middleware.validateAccountExistsForLogin,
   Middleware.validateUserEnteredCorrectPassword,
   Controllers.login
 );
