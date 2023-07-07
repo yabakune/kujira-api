@@ -1,6 +1,6 @@
 import { Prisma } from "@prisma/client";
 
-import * as Constants from "@/constants"
+import * as Constants from "@/constants";
 
 type DataResponse<Response> = {
   response: Response;
