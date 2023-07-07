@@ -101,12 +101,10 @@ export async function updateUserPassword(
     const encryptedPassword = await Helpers.encryptPassword(
       request.body.newPassword
     );
-    const data: Validators.UpdatePasswordValidator = {
-      password: encryptedPassword,
-    };
+
     await prisma.user.update({
       where: { id: Number(request.params.userId) },
-      data,
+      data: { password: encryptedPassword },
     });
 
     return response
