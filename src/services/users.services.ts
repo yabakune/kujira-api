@@ -101,3 +101,26 @@ export async function updateOneUser(
       .json(Helpers.generateErrorResponse(error, "Account does not exist."));
   }
 }
+
+export async function updateUserPassword(
+  response: Response,
+  userId: number,
+  newPassword: string
+) {
+  try {
+    const encryptedPassword = await Helpers.encryptPassword(newPassword);
+
+    await prisma.user.update({
+      where: { id: userId },
+      data: { password: encryptedPassword },
+    });
+
+    return response
+      .status(Constants.HttpStatusCodes.OK)
+      .json(Helpers.generateDataResponse(null, "Password updated!"));
+  } catch (error) {
+    return response
+      .status(Constants.HttpStatusCodes.BAD_REQUEST)
+      .json(Helpers.generateErrorResponse(error));
+  }
+}

@@ -54,24 +54,11 @@ export async function updateUserPassword(
   request: Request<{ userId: string }, {}, Validators.UpdatePasswordValidator>,
   response: Response
 ) {
-  try {
-    const encryptedPassword = await Helpers.encryptPassword(
-      request.body.newPassword
-    );
-
-    await prisma.user.update({
-      where: { id: Number(request.params.userId) },
-      data: { password: encryptedPassword },
-    });
-
-    return response
-      .status(Constants.HttpStatusCodes.OK)
-      .json(Helpers.generateDataResponse(null, "Password updated!"));
-  } catch (error) {
-    return response
-      .status(Constants.HttpStatusCodes.BAD_REQUEST)
-      .json(Helpers.generateErrorResponse(error));
-  }
+  return Services.updateUserPassword(
+    response,
+    Number(request.params.userId),
+    request.body.newPassword
+  );
 }
 
 // ========================================================================================= //
