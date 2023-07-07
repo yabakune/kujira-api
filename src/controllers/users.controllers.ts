@@ -94,14 +94,10 @@ export async function updateUser(
 // ========================================================================================= //
 
 export async function updateUserPassword(
-  request: Request<{ userId: string }, {}, { newPassword: string }>,
+  request: Request<{ userId: string }, {}, Validators.UpdatePasswordValidator>,
   response: Response
 ) {
   try {
-    // TODO : There should be a middleware that first checks to make sure that:
-    // 				1. The user entered the correct old password.
-    // 				2. The user entered a new password that isn't the same as the old password.
-
     const encryptedPassword = await Helpers.encryptPassword(
       request.body.newPassword
     );

@@ -23,12 +23,19 @@ usersRouter.patch(
   Controllers.updateUser
 );
 
+// const requiredPasswordUpdateData: Validators.RequiredUpdatePasswordData = [
+//   "password",
+// ];
+
 const requiredPasswordUpdateData: Validators.RequiredUpdatePasswordData = [
-  "password",
+  "oldPassword",
+  "newPassword",
 ];
 usersRouter.patch(
   "/:userId/update-password",
   Middleware.verifyClientPayload({ requiredData: requiredPasswordUpdateData }),
+  Middleware.validateCorrectOldPassword,
+  Middleware.validateNewPasswordIsNotSameAsPreviousPassword,
   Controllers.updateUserPassword
 );
 

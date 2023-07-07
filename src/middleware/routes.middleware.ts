@@ -31,7 +31,7 @@ function shortCircuitOnUnexpectedPayload(
   }
 }
 
-function checkUnexpectedPayload(
+function validateUnexpectedPayload(
   response: Response,
   suppliedClientPayload: string[],
   requiredData?: string[],
@@ -66,7 +66,7 @@ function generateMissingRequiredData(
   }
 }
 
-function checkMissingRequiredData(
+function validateMissingRequiredData(
   response: Response,
   suppliedClientPayload: string[],
   requiredData?: string[]
@@ -102,14 +102,14 @@ export function verifyClientPayload(
     const suppliedClientPayload = Object.keys(request.body); // Data sent from the client.
     const { requiredData, optionalData } = expectedClientPayload;
 
-    checkUnexpectedPayload(
+    validateUnexpectedPayload(
       response,
       suppliedClientPayload,
       requiredData,
       optionalData
     );
 
-    checkMissingRequiredData(response, suppliedClientPayload, requiredData);
+    validateMissingRequiredData(response, suppliedClientPayload, requiredData);
 
     return next();
   };

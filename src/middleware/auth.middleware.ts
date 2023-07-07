@@ -6,18 +6,14 @@ import { PrismaClient, User } from "@prisma/client";
 import * as Constants from "@/constants";
 import * as Helpers from "@/helpers";
 import * as Services from "@/services";
+import * as Types from "@/types";
 import * as Validators from "@/validators";
 
 const prisma = new PrismaClient();
 
-// ↓↓↓ Adding our found user to the middleware chain so we don't have to search for it with every step. ↓↓↓ //
-type AttachedUserFromPreviousMiddleware = {
-  attachedUserFromPreviousMiddleware?: User;
-};
-
 export async function validateUserExists(
   request: Request<{}, {}, { email: string }> &
-    AttachedUserFromPreviousMiddleware,
+    Types.AttachedUserFromPreviousMiddleware,
   response: Response,
   next: NextFunction
 ) {
@@ -41,7 +37,7 @@ export async function validateUserExists(
 
 export async function validateUserEnteredCorrectPassword(
   request: Request<{}, {}, Validators.LoginValidator> &
-    AttachedUserFromPreviousMiddleware,
+    Types.AttachedUserFromPreviousMiddleware,
   response: Response,
   next: NextFunction
 ) {
@@ -73,7 +69,7 @@ export async function validateUserEnteredCorrectPassword(
 
 function handleEmailCheck(
   request: Request<{}, {}, { email: string }> &
-    AttachedUserFromPreviousMiddleware,
+    Types.AttachedUserFromPreviousMiddleware,
   response: Response,
   next: NextFunction,
   user: User
@@ -99,7 +95,7 @@ function handleEmailCheck(
 
 export async function validateEmailVerified(
   request: Request<{}, {}, { email: string }> &
-    AttachedUserFromPreviousMiddleware,
+    Types.AttachedUserFromPreviousMiddleware,
   response: Response,
   next: NextFunction
 ) {
@@ -222,7 +218,7 @@ function checkVerificationCodeEnvironmentVariableExists(
 
 function checkIfUserHasVerificationCode(
   request: Request<{}, {}, Validators.VerificationCodeValidator> &
-    AttachedUserFromPreviousMiddleware,
+    Types.AttachedUserFromPreviousMiddleware,
   response: Response,
   next: NextFunction,
   user: User
@@ -252,7 +248,7 @@ function checkIfUserHasVerificationCode(
 
 export async function validateVerificationCode(
   request: Request<{}, {}, Validators.VerificationCodeValidator> &
-    AttachedUserFromPreviousMiddleware,
+    Types.AttachedUserFromPreviousMiddleware,
   response: Response,
   next: NextFunction
 ) {
