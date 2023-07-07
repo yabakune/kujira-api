@@ -25,7 +25,7 @@ export async function register(
       encryptedPassword
     );
   } catch (error) {
-    console.log("Auth Register Error:", error);
+    console.error("Auth Register Error:", error);
     return response
       .status(Constants.HttpStatusCodes.INTERNAL_SERVER_ERROR)
       .json(Helpers.generateErrorResponse(error));
@@ -46,7 +46,7 @@ export async function login(
       request.body.email
     );
   } catch (error) {
-    console.log("Auth Register Error:", error);
+    console.error("Auth Register Error:", error);
     return response
       .status(Constants.HttpStatusCodes.INTERNAL_SERVER_ERROR)
       .json(Helpers.generateErrorResponse(error));

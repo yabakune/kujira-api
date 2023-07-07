@@ -61,7 +61,7 @@ export function generateErrorResponse<Error>(
   ) {
     errorMessage = handlePrismaError(error.code, error.meta?.target);
   } else {
-    console.log("\n\n generateErrorResponse() Fallback:", error);
+    console.error("\n\n generateErrorResponse() Fallback:", error);
   }
 
   return {

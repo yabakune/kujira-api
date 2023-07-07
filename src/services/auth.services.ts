@@ -39,7 +39,7 @@ function generateAuthVerificationCodes() {
     );
     return { verificationCode, decodedVerificationCode };
   } else {
-    console.log(Constants.Errors.VERIFICATION_CODE_SECRET_KEY_DOES_NOT_EXIST);
+    console.error(Constants.Errors.VERIFICATION_CODE_SECRET_KEY_DOES_NOT_EXIST);
     throw new Error();
   }
 }
@@ -141,7 +141,7 @@ export function generateAccessToken(
       return accessToken;
     }
   } catch (error) {
-    console.log(Constants.Errors.AUTH_SECRET_KEY_DOES_NOT_EXIST);
+    console.error(Constants.Errors.AUTH_SECRET_KEY_DOES_NOT_EXIST);
     return response
       .status(Constants.HttpStatusCodes.INTERNAL_SERVER_ERROR)
       .json(
