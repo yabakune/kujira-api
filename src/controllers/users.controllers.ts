@@ -12,24 +12,8 @@ const prisma = new PrismaClient();
 // [ FETCH All USERS ] ===================================================================== //
 // ========================================================================================= //
 
-export async function getUsers(request: Request, response: Response) {
-  try {
-    const users = await prisma.user.findMany({ orderBy: { id: "asc" } });
-    const safeUsers = Services.generateSafeUsers(users);
-
-    return response
-      .status(Constants.HttpStatusCodes.OK)
-      .json(Helpers.generateDataResponse(safeUsers));
-  } catch (error) {
-    return response
-      .status(Constants.HttpStatusCodes.INTERNAL_SERVER_ERROR)
-      .json(
-        Helpers.generateErrorResponse(
-          error,
-          "There was an error fetching users. Please refresh the page."
-        )
-      );
-  }
+export async function getUsers(_: Request, response: Response) {
+  return Services.fetchAllUsers(response);
 }
 
 // ========================================================================================= //

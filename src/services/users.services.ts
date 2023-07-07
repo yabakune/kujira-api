@@ -1,4 +1,10 @@
-import { User } from "@prisma/client";
+import { Response } from "express";
+import { PrismaClient, User } from "@prisma/client";
+
+import * as Constants from "@/constants";
+import * as Helpers from "@/helpers";
+
+const prisma = new PrismaClient();
 
 function excludeFieldFromUsersObject<User, Field extends keyof User>(
   users: User[],
@@ -22,4 +28,24 @@ function excludeFieldFromUserObject<User, Field extends keyof User>(
 }
 export function generateSafeUser(user: User) {
   return excludeFieldFromUserObject(user, ["password", "verificationCode"]);
+}
+
+export async function fetchAllUsers(response: Response) {
+  try {
+    const users = await prisma.user.findMany({ orderBy: { id: "asc" } });
+    const safeUsers = generateSafeUsers(users);
+
+    return response
+      .status(Constants.HttpStatusCodes.OK)
+      .json(Helpers.generateDataResponse(safeUsers));
+  } catch (error) {
+    return response
+      .status(Constants.HttpStatusCodes.INTERNAL_SERVER_ERROR)
+      .json(
+        Helpers.generateErrorResponse(
+          error,
+          "There was an error fetching users. Please refresh the page."
+        )
+      );
+  }
 }
