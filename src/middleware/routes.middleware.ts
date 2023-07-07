@@ -58,6 +58,30 @@ function generateMissingRequiredData(
   }
 }
 
+function shortCircuitOnMissingRequiredData(
+  response: Response,
+  suppliedClientPayload: string[],
+  requiredData?: string[]
+) {
+  try {
+    const missingRequiredData = generateMissingRequiredData(
+      suppliedClientPayload,
+      requiredData
+    );
+    if (missingRequiredData.length > 0) {
+      throw new Error(missingRequiredData.join(", "));
+    } else {
+      return;
+    }
+  } catch (error: any) {
+    return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
+      Helpers.generateTextResponse({
+        body: `Missing Data: ${error.message}.`,
+      })
+    );
+  }
+}
+
 type ExpectedClientPayload = {
   requiredData?: string[];
   optionalData?: string[];
@@ -77,30 +101,13 @@ export function verifyClientPayload(
       optionalData
     );
 
-    const missingRequiredData = generateMissingRequiredData(
+    shortCircuitOnMissingRequiredData(
+      response,
       suppliedClientPayload,
       requiredData
     );
 
-    const missingOptionalData = optionalData
-      ? generateMissingClientData(suppliedClientPayload, optionalData)
-      : [];
-
-    if (missingRequiredData.length > 0) {
-      return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
-        Helpers.generateTextResponse({
-          body: `Missing Data: ${missingRequiredData.join(", ")}.`,
-        })
-      );
-    } else if (missingOptionalData.length > 0) {
-      return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
-        Helpers.generateTextResponse({
-          body: `Missing Data: ${missingOptionalData.join(", ")}.`,
-        })
-      );
-    } else {
-      return next();
-    }
+    return next();
   };
 }
 
