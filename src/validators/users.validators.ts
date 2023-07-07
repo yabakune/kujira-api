@@ -14,12 +14,6 @@ export type UserUpdateValidator = Partial<
 >;
 export type OptionalUserUpdateData = (keyof UserUpdateValidator)[];
 
-const updatePasswordPasswordValidator = Prisma.validator<Prisma.UserArgs>()({
-  select: { password: true },
-});
-// export type UpdatePasswordValidator = Prisma.UserGetPayload<
-//   typeof updatePasswordPasswordValidator
-// >;
 export type UpdatePasswordValidator = {
   oldPassword: string;
   newPassword: string;

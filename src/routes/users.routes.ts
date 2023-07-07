@@ -23,10 +23,6 @@ usersRouter.patch(
   Controllers.updateUser
 );
 
-// const requiredPasswordUpdateData: Validators.RequiredUpdatePasswordData = [
-//   "password",
-// ];
-
 const requiredPasswordUpdateData: Validators.RequiredUpdatePasswordData = [
   "oldPassword",
   "newPassword",
