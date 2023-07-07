@@ -41,8 +41,10 @@ export async function verifyRegistration(
   response: Response
 ) {
   try {
-    const { verifiedUser, accessToken } =
-      await Services.verifyRegistrationWithAuthToken(request.body.email);
+    const { verifiedUser, accessToken } = await Services.verifyAuthWithToken(
+      "Verifying Registration",
+      request.body.email
+    );
 
     const safeUser = Services.generateSafeUser(verifiedUser);
 
@@ -95,8 +97,11 @@ export async function verifyLogin(
   response: Response
 ) {
   try {
-    const { verifiedUser, accessToken } =
-      await Services.verifyNewUserWithAuthToken(request.body.email);
+    const { verifiedUser, accessToken } = await Services.verifyAuthWithToken(
+      "Verifying Login",
+      request.body.email,
+      request.body.thirtyDays
+    );
 
     const safeUser = Services.generateSafeUser(verifiedUser);
 

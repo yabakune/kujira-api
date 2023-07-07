@@ -1,4 +1,3 @@
-import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { Response } from "express";
 import { PrismaClient, User } from "@prisma/client";
@@ -102,18 +101,26 @@ export function generateAccessToken(
   return accessToken;
 }
 
-type EmailVerificationPayload = {
+type AuthVerificationPayload = {
   verifiedUser: User;
   accessToken: string;
 };
 
-export async function verifyRegistrationWithAuthToken(
-  email: string
-): Promise<EmailVerificationPayload> {
-  const verifiedUser = await prisma.user.update({
-    where: { email },
-    data: { verificationCode: null, emailVerified: true },
-  });
+export async function verifyAuthWithToken(
+  type: "Verifying Registration" | "Verifying Login",
+  email: string,
+  thirtyDays?: boolean
+): Promise<AuthVerificationPayload> {
+  const verifiedUser =
+    type === "Verifying Registration"
+      ? await prisma.user.update({
+          where: { email },
+          data: { verificationCode: null, emailVerified: true },
+        })
+      : await prisma.user.update({
+          where: { email },
+          data: { verificationCode: null },
+        });
 
   const authSecretKey = process.env.AUTH_SECRET_KEY;
   if (authSecretKey) {
@@ -164,29 +171,6 @@ export async function loginUserAndEmailVerificationCode(
           "Failed to login. Please try again."
         )
       );
-  }
-}
-
-export async function verifyLoginWithAuthToken(
-  email: string,
-  thirtyDays?: boolean
-) {
-  const verifiedUser = await prisma.user.update({
-    where: { email },
-    data: { verificationCode: null },
-  });
-
-  const authSecretKey = process.env.AUTH_SECRET_KEY;
-  if (authSecretKey) {
-    const accessToken = generateAccessToken(
-      verifiedUser.id,
-      authSecretKey,
-      true
-    );
-    return { verifiedUser, accessToken };
-  } else {
-    console.log("AUTH_SECRET_KEY environment variable does not exist.");
-    throw new Error();
   }
 }
 

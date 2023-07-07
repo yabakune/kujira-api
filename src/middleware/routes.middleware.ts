@@ -4,32 +4,34 @@ import * as Constants from "@/constants";
 import * as Helpers from "@/helpers";
 
 function generateMissingClientData(
-  clientData: string[],
-  expectedData: string[]
+  suppliedClientPayload: string[],
+  expectedClientPayload: string[]
 ) {
-  const missingClientData = expectedData.filter(
-    (data: string) => !clientData.includes(data)
+  const missingClientData = expectedClientPayload.filter(
+    (data: string) => !suppliedClientPayload.includes(data)
   );
 
   return missingClientData;
 }
 
-type ExpectedClientData = {
+type ExpectedClientPayload = {
   requiredData?: string[];
   optionalData?: string[];
 };
 
-export function verifyClientData(expectedClientData: ExpectedClientData) {
+export function verifyClientPayload(
+  expectedClientPayload: ExpectedClientPayload
+) {
   return (request: Request, response: Response, next: NextFunction) => {
-    const clientData = Object.keys(request.body); // Data sent from the client.
-    const { requiredData, optionalData } = expectedClientData;
+    const suppliedClientPayload = Object.keys(request.body); // Data sent from the client.
+    const { requiredData, optionalData } = expectedClientPayload;
 
     const missingRequiredData = requiredData
-      ? generateMissingClientData(clientData, requiredData)
+      ? generateMissingClientData(suppliedClientPayload, requiredData)
       : [];
 
     const missingOptionalData = optionalData
-      ? generateMissingClientData(clientData, optionalData)
+      ? generateMissingClientData(suppliedClientPayload, optionalData)
       : [];
 
     if (missingRequiredData.length > 0) {
