@@ -9,7 +9,7 @@ import * as Validators from "@/validators";
 
 const prisma = new PrismaClient();
 
-function generateVerificationCode(secretKey: string): string {
+function _generateVerificationCode(secretKey: string): string {
   let code = "";
   for (let i = 0; i < 8; i++) {
     code += Math.floor(Math.random() * 10);
@@ -29,10 +29,10 @@ export function decodeVerificationCode(
   return code;
 }
 
-function generateAuthVerificationCodes() {
+function _generateAuthVerificationCodes() {
   const secretKey = process.env.VERIFICATION_CODE_SECRET_KEY;
   if (secretKey) {
-    const verificationCode = generateVerificationCode(secretKey);
+    const verificationCode = _generateVerificationCode(secretKey);
     const decodedVerificationCode = decodeVerificationCode(
       verificationCode,
       secretKey
@@ -54,7 +54,7 @@ export async function registerNewUserAndEmailVerificationCode(
 ) {
   try {
     const { verificationCode, decodedVerificationCode } =
-      generateAuthVerificationCodes();
+      _generateAuthVerificationCodes();
 
     const data: Validators.RegistrationValidator = {
       email,
@@ -142,7 +142,7 @@ export async function loginUserAndEmailVerificationCode(
 ) {
   try {
     const { verificationCode, decodedVerificationCode } =
-      generateAuthVerificationCodes();
+      _generateAuthVerificationCodes();
 
     await prisma.user.update({
       where: { email },
@@ -180,7 +180,7 @@ export async function updateAndEmailUserWithNewVerificationCode(
 ) {
   try {
     const { verificationCode, decodedVerificationCode } =
-      generateAuthVerificationCodes();
+      _generateAuthVerificationCodes();
 
     const userWithNewVerificationCode = await prisma.user.update({
       where: { email },
