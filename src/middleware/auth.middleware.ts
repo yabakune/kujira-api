@@ -108,6 +108,53 @@ function checkJWTExpired(jsonWebToken: string, secretKey: string): boolean {
   return isExpired;
 }
 
+function handleVerificationCodeAuth(
+  request: Request,
+  response: Response,
+  next: NextFunction,
+  verificationCodeInDatabase: string
+) {
+  try {
+    const secretKey = process.env.VERIFICATION_CODE_SECRET_KEY;
+    if (!secretKey) {
+      throw new Error();
+    } else {
+      const verificationCodeHasExpired = checkJWTExpired(
+        verificationCodeInDatabase,
+        secretKey
+      );
+      const userProvidedIncorrectVerificationCode =
+        Services.decodeVerificationCode(
+          verificationCodeInDatabase,
+          secretKey
+        ) !== request.body.verificationCode;
+
+      if (verificationCodeHasExpired) {
+        return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
+          Helpers.generateTextResponse({
+            body: "Verification code expired. Please request a new verification code.",
+          })
+        );
+      } else if (userProvidedIncorrectVerificationCode) {
+        return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
+          Helpers.generateTextResponse({
+            body: "Invalid verification code. Please supply the correct code.",
+          })
+        );
+      } else {
+        return next();
+      }
+    }
+  } catch (error) {
+    console.log(
+      "VERIFICATION_CODE_SECRET_KEY environment variable does not exist."
+    );
+    return response
+      .status(Constants.HttpStatusCodes.INTERNAL_SERVER_ERROR)
+      .json(Helpers.generateErrorResponse(error));
+  }
+}
+
 export async function checkSubmittedVerificationCode(
   request: Request<{}, {}, Validators.VerificationCodeValidator> &
     AttachedUserFromPreviousMiddleware,
@@ -129,32 +176,14 @@ export async function checkSubmittedVerificationCode(
         })
       );
     } else {
-      const secretKey = process.env.VERIFICATION_CODE_SECRET_KEY;
-      if (!secretKey) {
-        throw new Error();
-      } else if (checkJWTExpired(user.verificationCode, secretKey)) {
-        return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
-          Helpers.generateTextResponse({
-            body: "Verification code expired. Please request a new verification code.",
-          })
-        );
-      } else if (
-        Services.decodeVerificationCode(user.verificationCode, secretKey) !==
-        request.body.verificationCode
-      ) {
-        return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
-          Helpers.generateTextResponse({
-            body: "Invalid verification code. Please supply the correct code.",
-          })
-        );
-      } else {
-        return next();
-      }
+      return handleVerificationCodeAuth(
+        request,
+        response,
+        next,
+        user.verificationCode
+      );
     }
   } catch (error) {
-    console.log(
-      "VERIFICATION_CODE_SECRET_KEY environment variable MAY not exist."
-    );
     console.log("checkSubmittedVerificationCode() Error:", error);
     return response
       .status(Constants.HttpStatusCodes.INTERNAL_SERVER_ERROR)
