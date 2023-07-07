@@ -11,7 +11,7 @@ import helmet from "helmet";
 import { rateLimit } from "express-rate-limit";
 
 import * as Routes from "@/routes";
-import { generateErrorResponse } from "./helpers";
+import { generateResponse } from "./helpers";
 
 dotenv.config();
 const app = express();
@@ -52,7 +52,10 @@ const errorFallbackMiddleware: ErrorRequestHandler = (
   response: Response,
   next: NextFunction
 ) => {
-  if (error) response.json(generateErrorResponse(error, error.message));
+  if (error) {
+    console.error(error);
+    return response.json(generateResponse({ body: error.message }));
+  }
 };
 app.use(errorFallbackMiddleware);
 

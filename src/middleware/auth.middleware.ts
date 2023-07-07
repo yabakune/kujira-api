@@ -27,14 +27,13 @@ export async function validateAccountDoesNotExist(
       return next();
     }
   } catch (error) {
-    return response
-      .status(Constants.HttpStatusCodes.BAD_REQUEST)
-      .json(
-        Helpers.generateErrorResponse(
-          error,
-          Constants.Errors.ACCOUNT_ALREADY_EXISTS
-        )
-      );
+    console.error(error);
+    return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
+      Helpers.generateResponse({
+        body: Constants.Errors.ACCOUNT_ALREADY_EXISTS,
+        caption: Constants.Errors.CONTACT_EMAIL,
+      })
+    );
   }
 }
 
@@ -52,14 +51,13 @@ export async function validateAccountExists(
     request.attachedUserFromPreviousMiddleware = user;
     return next();
   } catch (error) {
-    return response
-      .status(Constants.HttpStatusCodes.BAD_REQUEST)
-      .json(
-        Helpers.generateErrorResponse(
-          error,
-          Constants.Errors.ACCOUNT_DOES_NOT_EXIST
-        )
-      );
+    console.error(error);
+    return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
+      Helpers.generateResponse({
+        body: Constants.Errors.ACCOUNT_DOES_NOT_EXIST,
+        caption: Constants.Errors.CONTACT_EMAIL,
+      })
+    );
   }
 }
 
@@ -84,14 +82,13 @@ export async function validateUserEnteredCorrectPassword(
     if (passwordsMatch) return next();
     else throw new Error();
   } catch (error) {
-    return response
-      .status(Constants.HttpStatusCodes.BAD_REQUEST)
-      .json(
-        Helpers.generateErrorResponse(
-          error,
-          "Password incorrect. Please enter the correct password"
-        )
-      );
+    console.error(error);
+    return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
+      Helpers.generateResponse({
+        body: "Incorrect password. Please enter the correct password",
+        caption: Constants.Errors.CONTACT_EMAIL,
+      })
+    );
   }
 }
 
@@ -114,14 +111,13 @@ function handleEmailCheck(
       return next();
     }
   } catch (error) {
-    return response
-      .status(Constants.HttpStatusCodes.BAD_REQUEST)
-      .json(
-        Helpers.generateErrorResponse(
-          error,
-          `Email ${request.body.email} is already verified. Please log in.`
-        )
-      );
+    console.error(error);
+    return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
+      Helpers.generateResponse({
+        body: `Email ${request.body.email} is already verified. Please log in.`,
+        caption: Constants.Errors.CONTACT_EMAIL,
+      })
+    );
   }
 }
 
@@ -138,9 +134,13 @@ export async function validateEmailVerified(
 
     return handleEmailCheck(request, response, next, user);
   } catch (error) {
-    return response
-      .status(Constants.HttpStatusCodes.BAD_REQUEST)
-      .json(Helpers.generateErrorResponse(error));
+    console.error(error);
+    return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
+      Helpers.generateResponse({
+        body: Constants.Errors.ACCOUNT_DOES_NOT_EXIST,
+        caption: Constants.Errors.CONTACT_EMAIL,
+      })
+    );
   }
 }
 
@@ -166,14 +166,13 @@ function checkIfUserProvidedIncorrectVerificationCode(
     if (userProvidedIncorrectVerificationCode) throw new Error();
     else return next();
   } catch (error) {
-    return response
-      .status(Constants.HttpStatusCodes.BAD_REQUEST)
-      .json(
-        Helpers.generateErrorResponse(
-          error,
-          "Invalid verification code. Please supply the correct code."
-        )
-      );
+    console.error(error);
+    return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
+      Helpers.generateResponse({
+        body: "Invalid verification code. Please supply the correct code.",
+        caption: Constants.Errors.CONTACT_EMAIL,
+      })
+    );
   }
 }
 
@@ -210,14 +209,13 @@ function checkIfVerificationCodeHasExpired(
       );
     }
   } catch (error) {
-    return response
-      .status(Constants.HttpStatusCodes.BAD_REQUEST)
-      .json(
-        Helpers.generateErrorResponse(
-          error,
-          "Verification code expired. Please request a new verification code."
-        )
-      );
+    console.error(error);
+    return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
+      Helpers.generateResponse({
+        body: "Verification code expired. Please request a new verification code.",
+        caption: Constants.Errors.CONTACT_EMAIL,
+      })
+    );
   }
 }
 
@@ -245,10 +243,10 @@ function checkVerificationCodeEnvironmentVariableExists(
     return response
       .status(Constants.HttpStatusCodes.INTERNAL_SERVER_ERROR)
       .json(
-        Helpers.generateErrorResponse(
-          error,
-          "There was an error with validating your verification code."
-        )
+        Helpers.generateResponse({
+          body: "There was an error with validating your verification code.",
+          caption: Constants.Errors.CONTACT_EMAIL,
+        })
       );
   }
 }
@@ -272,14 +270,13 @@ function checkIfUserHasVerificationCode(
       );
     }
   } catch (error) {
-    return response
-      .status(Constants.HttpStatusCodes.BAD_REQUEST)
-      .json(
-        Helpers.generateErrorResponse(
-          error,
-          "Account does not have a verification code. Please log in or request a new verification code."
-        )
-      );
+    console.error(error);
+    return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
+      Helpers.generateResponse({
+        body: "Account does not have a verification code. Please log in or request a new verification code.",
+        caption: Constants.Errors.CONTACT_EMAIL,
+      })
+    );
   }
 }
 
@@ -298,8 +295,12 @@ export async function validateVerificationCode(
 
     return checkIfUserHasVerificationCode(request, response, next, user);
   } catch (error) {
-    return response
-      .status(Constants.HttpStatusCodes.BAD_REQUEST)
-      .json(Helpers.generateErrorResponse(error));
+    console.error(error);
+    return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
+      Helpers.generateResponse({
+        body: "Failed to validate verification code. Please try again.",
+        caption: Constants.Errors.CONTACT_EMAIL,
+      })
+    );
   }
 }

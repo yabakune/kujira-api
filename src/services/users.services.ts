@@ -38,15 +38,16 @@ export async function getUsers(response: Response) {
 
     return response
       .status(Constants.HttpStatusCodes.OK)
-      .json(Helpers.generateDataResponse(safeUsers));
+      .json(Helpers.generateResponse({ response: safeUsers }));
   } catch (error) {
+    console.error(error);
     return response
       .status(Constants.HttpStatusCodes.INTERNAL_SERVER_ERROR)
       .json(
-        Helpers.generateErrorResponse(
-          error,
-          "There was an error fetching users. Please refresh the page."
-        )
+        Helpers.generateResponse({
+          body: "There was an error fetching accounts. Please refresh the page.",
+          caption: Constants.Errors.CONTACT_EMAIL,
+        })
       );
   }
 }
@@ -60,16 +61,15 @@ export async function getUser(response: Response, userId: number) {
 
     return response
       .status(Constants.HttpStatusCodes.OK)
-      .json(Helpers.generateDataResponse(safeUser));
+      .json(Helpers.generateResponse({ response: safeUser }));
   } catch (error) {
-    return response
-      .status(Constants.HttpStatusCodes.BAD_REQUEST)
-      .json(
-        Helpers.generateErrorResponse(
-          error,
-          Constants.Errors.ACCOUNT_DOES_NOT_EXIST
-        )
-      );
+    console.error(error);
+    return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
+      Helpers.generateResponse({
+        body: Constants.Errors.ACCOUNT_DOES_NOT_EXIST,
+        caption: Constants.Errors.CONTACT_EMAIL,
+      })
+    );
   }
 }
 
@@ -97,18 +97,20 @@ export async function updateUser(
     });
     const safeUser = generateSafeUser(updatedUser);
 
-    return response
-      .status(Constants.HttpStatusCodes.OK)
-      .json(Helpers.generateDataResponse(safeUser, "Account updated!"));
+    return response.status(Constants.HttpStatusCodes.OK).json(
+      Helpers.generateResponse({
+        body: "Account updated!",
+        response: safeUser,
+      })
+    );
   } catch (error) {
-    return response
-      .status(Constants.HttpStatusCodes.BAD_REQUEST)
-      .json(
-        Helpers.generateErrorResponse(
-          error,
-          Constants.Errors.ACCOUNT_DOES_NOT_EXIST
-        )
-      );
+    console.error(error);
+    return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
+      Helpers.generateResponse({
+        body: Constants.Errors.ACCOUNT_DOES_NOT_EXIST,
+        caption: Constants.Errors.CONTACT_EMAIL,
+      })
+    );
   }
 }
 
@@ -127,11 +129,15 @@ export async function updateUserPassword(
 
     return response
       .status(Constants.HttpStatusCodes.OK)
-      .json(Helpers.generateDataResponse(null, "Password updated!"));
+      .json(Helpers.generateResponse({ body: "Password updated!" }));
   } catch (error) {
-    return response
-      .status(Constants.HttpStatusCodes.BAD_REQUEST)
-      .json(Helpers.generateErrorResponse(error));
+    console.error(error);
+    return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
+      Helpers.generateResponse({
+        body: "Failed to update password. Please try again.",
+        caption: Constants.Errors.CONTACT_EMAIL,
+      })
+    );
   }
 }
 
@@ -142,15 +148,16 @@ export async function deleteUser(response: Response, userId: number) {
     });
     return response
       .status(Constants.HttpStatusCodes.OK)
-      .json(Helpers.generateDataResponse(id, "Account deleted!"));
-  } catch (error) {
-    return response
-      .status(Constants.HttpStatusCodes.BAD_REQUEST)
       .json(
-        Helpers.generateErrorResponse(
-          error,
-          Constants.Errors.ACCOUNT_DOES_NOT_EXIST
-        )
+        Helpers.generateResponse({ body: "Account deleted!", response: id })
       );
+  } catch (error) {
+    console.error(error);
+    return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
+      Helpers.generateResponse({
+        body: Constants.Errors.ACCOUNT_DOES_NOT_EXIST,
+        caption: Constants.Errors.CONTACT_EMAIL,
+      })
+    );
   }
 }

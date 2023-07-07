@@ -20,14 +20,13 @@ function shortCircuitOnUnexpectedPayload(
     }
     return;
   } catch (error: any) {
-    return response
-      .status(Constants.HttpStatusCodes.BAD_REQUEST)
-      .json(
-        Helpers.generateErrorResponse(
-          error,
-          `Unexpected input: ${error.message}. Please provide the correct details.`
-        )
-      );
+    console.error(error);
+    return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
+      Helpers.generateResponse({
+        body: `Unexpected input: ${error.message}. Please provide the correct details.`,
+        caption: Constants.Errors.CONTACT_EMAIL,
+      })
+    );
   }
 }
 
@@ -82,11 +81,13 @@ function validateMissingRequiredData(
       return;
     }
   } catch (error: any) {
-    return response
-      .status(Constants.HttpStatusCodes.BAD_REQUEST)
-      .json(
-        Helpers.generateErrorResponse(error, `Missing Data: ${error.message}.`)
-      );
+    console.error(error);
+    return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
+      Helpers.generateResponse({
+        body: `Missing Data: ${error.message}.`,
+        caption: Constants.Errors.CONTACT_EMAIL,
+      })
+    );
   }
 }
 

@@ -69,21 +69,20 @@ export async function registerNewUserAndEmailVerificationCode(
     ]);
 
     return response.status(Constants.HttpStatusCodes.CREATED).json(
-      Helpers.generateTextResponse({
+      Helpers.generateResponse({
         title: "Thank you for registering with Kujira!",
         body: "A verification code was sent to your email. Please enter it below.",
         caption: "Note that your code will expire within 5 minutes.",
       })
     );
   } catch (error) {
-    return response
-      .status(Constants.HttpStatusCodes.BAD_REQUEST)
-      .json(
-        Helpers.generateErrorResponse(
-          error,
-          "Failed to register new account. Please try again."
-        )
-      );
+    console.error(error);
+    return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
+      Helpers.generateResponse({
+        body: "Failed to register new account. Please try again.",
+        caption: Constants.Errors.CONTACT_EMAIL,
+      })
+    );
   }
 }
 
@@ -107,21 +106,20 @@ export async function loginUserAndEmailVerificationCode(
     ]);
 
     return response.status(Constants.HttpStatusCodes.CREATED).json(
-      Helpers.generateTextResponse({
+      Helpers.generateResponse({
         title: "Welcome back!",
         body: "A verification code was sent to your email. Please enter it below.",
         caption: "Note that your code will expire within 5 minutes.",
       })
     );
   } catch (error) {
-    return response
-      .status(Constants.HttpStatusCodes.BAD_REQUEST)
-      .json(
-        Helpers.generateErrorResponse(
-          error,
-          "Failed to log in. Please try again."
-        )
-      );
+    console.error(error);
+    return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
+      Helpers.generateResponse({
+        body: "Failed to log in. Please try again.",
+        caption: Constants.Errors.CONTACT_EMAIL,
+      })
+    );
   }
 }
 
@@ -141,14 +139,15 @@ export function generateAccessToken(
       return accessToken;
     }
   } catch (error) {
+    console.error(error);
     console.error(Constants.Errors.AUTH_SECRET_KEY_DOES_NOT_EXIST);
     return response
       .status(Constants.HttpStatusCodes.INTERNAL_SERVER_ERROR)
       .json(
-        Helpers.generateErrorResponse(
-          error,
-          "There was an error with authentication. Please log in or request a new verification code."
-        )
+        Helpers.generateResponse({
+          body: "There was an error with authenticating your account. Please log in or request a new verification code.",
+          caption: Constants.Errors.CONTACT_EMAIL,
+        })
       );
   }
 }
@@ -194,8 +193,12 @@ export async function sendUserNewVerificationCode(
 
     return safeUser;
   } catch (error) {
-    return response
-      .status(Constants.HttpStatusCodes.BAD_REQUEST)
-      .json(Helpers.generateErrorResponse(error));
+    console.error(error);
+    return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
+      Helpers.generateResponse({
+        body: "Failed to send new verification code. Please try again.",
+        caption: Constants.Errors.CONTACT_EMAIL,
+      })
+    );
   }
 }

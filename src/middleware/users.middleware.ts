@@ -30,14 +30,13 @@ function handleCorrectPasswordValidation(
       throw new Error();
     }
   } catch (error) {
-    return response
-      .status(Constants.HttpStatusCodes.BAD_REQUEST)
-      .json(
-        Helpers.generateErrorResponse(
-          error,
-          "Incorrect old password. Please try again."
-        )
-      );
+    console.error(error);
+    return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
+      Helpers.generateResponse({
+        body: "Incorrect old password. Please try again.",
+        caption: Constants.Errors.CONTACT_EMAIL,
+      })
+    );
   }
 }
 
@@ -60,14 +59,13 @@ export async function validateCorrectOldPassword(
       user
     );
   } catch (error) {
-    return response
-      .status(Constants.HttpStatusCodes.BAD_REQUEST)
-      .json(
-        Helpers.generateErrorResponse(
-          error,
-          Constants.Errors.ACCOUNT_DOES_NOT_EXIST
-        )
-      );
+    console.error(error);
+    return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
+      Helpers.generateResponse({
+        body: Constants.Errors.ACCOUNT_DOES_NOT_EXIST,
+        caption: Constants.Errors.CONTACT_EMAIL,
+      })
+    );
   }
 }
 
@@ -89,14 +87,13 @@ function handleNewPasswordValidation(
       return next();
     }
   } catch (error) {
-    return response
-      .status(Constants.HttpStatusCodes.BAD_REQUEST)
-      .json(
-        Helpers.generateErrorResponse(
-          error,
-          "Please enter a unique new password."
-        )
-      );
+    console.error(error);
+    return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
+      Helpers.generateResponse({
+        body: "Please enter a unique new password.",
+        caption: Constants.Errors.CONTACT_EMAIL,
+      })
+    );
   }
 }
 
@@ -120,13 +117,12 @@ export async function validateNewPasswordIsNotSameAsPreviousPassword(
       user
     );
   } catch (error) {
-    return response
-      .status(Constants.HttpStatusCodes.BAD_REQUEST)
-      .json(
-        Helpers.generateErrorResponse(
-          error,
-          Constants.Errors.ACCOUNT_DOES_NOT_EXIST
-        )
-      );
+    console.error(error);
+    return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
+      Helpers.generateResponse({
+        body: Constants.Errors.ACCOUNT_DOES_NOT_EXIST,
+        caption: Constants.Errors.CONTACT_EMAIL,
+      })
+    );
   }
 }

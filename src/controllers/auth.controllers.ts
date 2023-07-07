@@ -25,10 +25,15 @@ export async function register(
       encryptedPassword
     );
   } catch (error) {
-    console.error("Auth Register Error:", error);
+    console.error(error);
     return response
       .status(Constants.HttpStatusCodes.INTERNAL_SERVER_ERROR)
-      .json(Helpers.generateErrorResponse(error));
+      .json(
+        Helpers.generateResponse({
+          body: "Failed to register your account. Please refresh the page and try again.",
+          caption: Constants.Errors.CONTACT_EMAIL,
+        })
+      );
   }
 }
 
@@ -46,10 +51,15 @@ export async function login(
       request.body.email
     );
   } catch (error) {
-    console.error("Auth Register Error:", error);
+    console.error(error);
     return response
       .status(Constants.HttpStatusCodes.INTERNAL_SERVER_ERROR)
-      .json(Helpers.generateErrorResponse(error));
+      .json(
+        Helpers.generateResponse({
+          body: "Failed to log in. Please refresh the page and try again.",
+          caption: Constants.Errors.CONTACT_EMAIL,
+        })
+      );
   }
 }
 
@@ -68,20 +78,28 @@ export async function verifyRegistration(
     );
     const safeUser = Services.generateSafeUser(verifiedUser);
 
-    const accessToken = Services.generateAccessToken(response, safeUser.id);
+    const accessToken = Services.generateAccessToken(
+      response,
+      safeUser.id,
+      true
+    );
 
-    return response
-      .status(Constants.HttpStatusCodes.OK)
-      .json(
-        Helpers.generateDataResponse(
-          { safeUser, accessToken },
-          "Email verified!"
-        )
-      );
+    return response.status(Constants.HttpStatusCodes.OK).json(
+      Helpers.generateResponse({
+        body: "Email verified!",
+        response: { safeUser, accessToken },
+      })
+    );
   } catch (error) {
+    console.error(error);
     return response
       .status(Constants.HttpStatusCodes.INTERNAL_SERVER_ERROR)
-      .json(Helpers.generateErrorResponse(error));
+      .json(
+        Helpers.generateResponse({
+          body: "Failed to verify registration. Please try again.",
+          caption: Constants.Errors.CONTACT_EMAIL,
+        })
+      );
   }
 }
 
@@ -110,15 +128,22 @@ export async function verifyLogin(
       request.body.thirtyDays
     );
 
-    return response
-      .status(Constants.HttpStatusCodes.OK)
-      .json(
-        Helpers.generateDataResponse({ safeUser, accessToken }, "Logged in!")
-      );
+    return response.status(Constants.HttpStatusCodes.OK).json(
+      Helpers.generateResponse({
+        body: "Logging in!",
+        response: { safeUser, accessToken },
+      })
+    );
   } catch (error) {
+    console.error(error);
     return response
       .status(Constants.HttpStatusCodes.INTERNAL_SERVER_ERROR)
-      .json(Helpers.generateErrorResponse(error));
+      .json(
+        Helpers.generateResponse({
+          body: "Failed to verify login. Please try again.",
+          caption: Constants.Errors.CONTACT_EMAIL,
+        })
+      );
   }
 }
 
@@ -136,22 +161,19 @@ export async function sendNewVerificationCode(
       request.body.email
     );
 
-    return response
-      .status(Constants.HttpStatusCodes.OK)
-      .json(
-        Helpers.generateDataResponse(
-          safeUser,
-          "New verification code sent! Please check your email."
-        )
-      );
+    return response.status(Constants.HttpStatusCodes.OK).json(
+      Helpers.generateResponse({
+        body: "New verification code sent! Please check your email.",
+        response: { safeUser },
+      })
+    );
   } catch (error) {
-    return response
-      .status(Constants.HttpStatusCodes.BAD_REQUEST)
-      .json(
-        Helpers.generateErrorResponse(
-          error,
-          "Failed to create new registration code. Please refresh the page and try again."
-        )
-      );
+    console.error(error);
+    return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
+      Helpers.generateResponse({
+        body: "Failed to create new registration code. Please try again.",
+        caption: Constants.Errors.CONTACT_EMAIL,
+      })
+    );
   }
 }
