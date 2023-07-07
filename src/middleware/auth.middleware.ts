@@ -14,7 +14,7 @@ type AttachedUserFromPreviousMiddleware = {
   attachedUserFromPreviousMiddleware?: User;
 };
 
-export async function checkEmailVerified(
+export async function validateEmailVerified(
   request: Request<{}, {}, { email: string }> &
     AttachedUserFromPreviousMiddleware,
   response: Response,
@@ -43,7 +43,7 @@ export async function checkEmailVerified(
   }
 }
 
-export async function checkUserExists(
+export async function validateUserExists(
   request: Request<{}, {}, { email: string }> &
     AttachedUserFromPreviousMiddleware,
   response: Response,
@@ -67,7 +67,7 @@ export async function checkUserExists(
   }
 }
 
-export async function checkUserEnteredCorrectPassword(
+export async function validateUserEnteredCorrectPassword(
   request: Request<{}, {}, Validators.LoginValidator> &
     AttachedUserFromPreviousMiddleware,
   response: Response,
@@ -151,11 +151,16 @@ function _handleVerificationCodeAuth(
     );
     return response
       .status(Constants.HttpStatusCodes.INTERNAL_SERVER_ERROR)
-      .json(Helpers.generateErrorResponse(error));
+      .json(
+        Helpers.generateErrorResponse(
+          error,
+          "There was an error with validating your verification code."
+        )
+      );
   }
 }
 
-export async function checkSubmittedVerificationCode(
+export async function validateSubmittedVerificationCode(
   request: Request<{}, {}, Validators.VerificationCodeValidator> &
     AttachedUserFromPreviousMiddleware,
   response: Response,
@@ -184,7 +189,7 @@ export async function checkSubmittedVerificationCode(
       );
     }
   } catch (error) {
-    console.log("checkSubmittedVerificationCode() Error:", error);
+    console.log("validateSubmittedVerificationCode() Error:", error);
     return response
       .status(Constants.HttpStatusCodes.INTERNAL_SERVER_ERROR)
       .json(Helpers.generateErrorResponse(error));

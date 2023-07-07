@@ -27,8 +27,8 @@ authRouter.post(
   Middleware.verifyClientPayload({
     requiredData: requiredVerificationCodeData,
   }),
-  Middleware.checkEmailVerified,
-  Middleware.checkSubmittedVerificationCode,
+  Middleware.validateEmailVerified,
+  Middleware.validateSubmittedVerificationCode,
   Controllers.verifyRegistration
 );
 
@@ -36,8 +36,8 @@ const requiredLoginData: Validators.RequiredLoginData = ["email", "password"];
 authRouter.post(
   "/login",
   Middleware.verifyClientPayload({ requiredData: requiredLoginData }),
-  Middleware.checkUserExists,
-  Middleware.checkUserEnteredCorrectPassword,
+  Middleware.validateUserExists,
+  Middleware.validateUserEnteredCorrectPassword,
   Controllers.login
 );
 
@@ -47,7 +47,7 @@ authRouter.post(
     requiredData: requiredVerificationCodeData,
     optionalData: ["thirtyDays"],
   }),
-  Middleware.checkSubmittedVerificationCode,
+  Middleware.validateSubmittedVerificationCode,
   Controllers.verifyLogin
 );
 
