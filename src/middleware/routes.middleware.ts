@@ -7,7 +7,7 @@ import * as Helpers from "@/helpers";
 // [ MAKING SURE THE CLIENT SENT THE CORRECT DATA TO THE API ] ============================= //
 // ========================================================================================= //
 
-function shortCircuitOnIncorrectPayload(
+function handleShortCircuit(
   response: Response,
   suppliedClientPayload: string[],
   expectedClientPayload: string[]
@@ -21,28 +21,25 @@ function shortCircuitOnIncorrectPayload(
   } catch (error) {
     return response
       .status(Constants.HttpStatusCodes.BAD_REQUEST)
-      .json(Helpers.generateErrorResponse(error, "Unacceptable input."));
+      .json(
+        Helpers.generateErrorResponse(
+          error,
+          "Unexpected input. Please provide the correct details."
+        )
+      );
   }
 }
 
-function handleShortCircuitOnUnacceptableClientPayload(
+function shortCircuitOnUnexpectedPayload(
   response: Response,
   suppliedClientPayload: string[],
   requiredData?: string[],
   optionalData?: string[]
 ) {
   if (requiredData && requiredData.length > 0) {
-    shortCircuitOnIncorrectPayload(
-      response,
-      suppliedClientPayload,
-      requiredData
-    );
+    handleShortCircuit(response, suppliedClientPayload, requiredData);
   } else if (optionalData && optionalData.length > 0) {
-    shortCircuitOnIncorrectPayload(
-      response,
-      suppliedClientPayload,
-      optionalData
-    );
+    handleShortCircuit(response, suppliedClientPayload, optionalData);
   }
 }
 
@@ -69,7 +66,7 @@ export function verifyClientPayload(
     const suppliedClientPayload = Object.keys(request.body); // Data sent from the client.
     const { requiredData, optionalData } = expectedClientPayload;
 
-    handleShortCircuitOnUnacceptableClientPayload(
+    shortCircuitOnUnexpectedPayload(
       response,
       suppliedClientPayload,
       requiredData,
