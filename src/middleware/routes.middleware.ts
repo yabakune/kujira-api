@@ -13,18 +13,19 @@ function handleShortCircuit(
   expectedClientPayload: string[]
 ) {
   try {
-    for (const suppliedPayload in suppliedClientPayload) {
+    for (const suppliedPayload of suppliedClientPayload) {
       if (!expectedClientPayload.includes(suppliedPayload)) {
-        throw new Error();
+        throw new Error(suppliedPayload);
       }
     }
-  } catch (error) {
+    return;
+  } catch (error: any) {
     return response
       .status(Constants.HttpStatusCodes.BAD_REQUEST)
       .json(
         Helpers.generateErrorResponse(
           error,
-          "Unexpected input. Please provide the correct details."
+          `Unexpected input: ${error.message}. Please provide the correct details.`
         )
       );
   }
