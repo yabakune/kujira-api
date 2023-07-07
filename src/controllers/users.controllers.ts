@@ -8,7 +8,7 @@ import * as Validators from "@/validators";
 // ========================================================================================= //
 
 export async function getUsers(_: Request, response: Response) {
-  return Services.fetchAllUsers(response);
+  return Services.getUsers(response);
 }
 
 // ========================================================================================= //
@@ -19,7 +19,7 @@ export async function getUser(
   request: Request<{ userId: string }>,
   response: Response
 ) {
-  return Services.fetchOneUser(response, Number(request.params.userId));
+  return Services.getUser(response, Number(request.params.userId));
 }
 
 // ========================================================================================= //
@@ -30,7 +30,7 @@ export async function updateUser(
   request: Request<{ userId: string }, {}, Validators.UserUpdateValidator>,
   response: Response
 ) {
-  return Services.updateOneUser(
+  return Services.updateUser(
     response,
     Number(request.params.userId),
     request.body.email,

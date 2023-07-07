@@ -31,7 +31,7 @@ export function generateSafeUser(user: User) {
   return excludeFieldFromUserObject(user, ["password", "verificationCode"]);
 }
 
-export async function fetchAllUsers(response: Response) {
+export async function getUsers(response: Response) {
   try {
     const users = await prisma.user.findMany({ orderBy: { id: "asc" } });
     const safeUsers = generateSafeUsers(users);
@@ -51,7 +51,7 @@ export async function fetchAllUsers(response: Response) {
   }
 }
 
-export async function fetchOneUser(response: Response, userId: number) {
+export async function getUser(response: Response, userId: number) {
   try {
     const user = await prisma.user.findUniqueOrThrow({
       where: { id: userId },
@@ -68,7 +68,7 @@ export async function fetchOneUser(response: Response, userId: number) {
   }
 }
 
-export async function updateOneUser(
+export async function updateUser(
   response: Response,
   userId: number,
   email?: string,
