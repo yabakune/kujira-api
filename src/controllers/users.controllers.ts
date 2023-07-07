@@ -71,8 +71,6 @@ export async function updateUser(
       currency: request.body.currency,
       theme: request.body.theme,
       mobileNumber: request.body.mobileNumber,
-      emailVerified: request.body.emailVerified,
-      onboarded: request.body.onboarded,
     };
 
     const updatedUser = await prisma.user.update({
