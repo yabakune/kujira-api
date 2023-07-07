@@ -1,8 +1,9 @@
 import { Response } from "express";
-import { PrismaClient, User } from "@prisma/client";
+import { Currency, PrismaClient, Theme, User } from "@prisma/client";
 
 import * as Constants from "@/constants";
 import * as Helpers from "@/helpers";
+import * as Validators from "@/validators";
 
 const prisma = new PrismaClient();
 
@@ -60,6 +61,40 @@ export async function fetchOneUser(response: Response, userId: number) {
     return response
       .status(Constants.HttpStatusCodes.OK)
       .json(Helpers.generateDataResponse(safeUser));
+  } catch (error) {
+    return response
+      .status(Constants.HttpStatusCodes.BAD_REQUEST)
+      .json(Helpers.generateErrorResponse(error, "Account does not exist."));
+  }
+}
+
+export async function updateOneUser(
+  response: Response,
+  userId: number,
+  email?: string,
+  username?: string,
+  currency?: Currency,
+  theme?: Theme,
+  mobileNumber?: string | null
+) {
+  try {
+    const data: Validators.UserUpdateValidator = {
+      email,
+      username,
+      currency,
+      theme,
+      mobileNumber,
+    };
+
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data,
+    });
+    const safeUser = generateSafeUser(updatedUser);
+
+    return response
+      .status(Constants.HttpStatusCodes.OK)
+      .json(Helpers.generateDataResponse(safeUser, "Account updated!"));
   } catch (error) {
     return response
       .status(Constants.HttpStatusCodes.BAD_REQUEST)

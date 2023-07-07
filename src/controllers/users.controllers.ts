@@ -35,29 +35,15 @@ export async function updateUser(
   request: Request<{ userId: string }, {}, Validators.UserUpdateValidator>,
   response: Response
 ) {
-  try {
-    const data: Validators.UserUpdateValidator = {
-      email: request.body.email,
-      username: request.body.username,
-      currency: request.body.currency,
-      theme: request.body.theme,
-      mobileNumber: request.body.mobileNumber,
-    };
-
-    const updatedUser = await prisma.user.update({
-      where: { id: Number(request.params.userId) },
-      data,
-    });
-    const safeUser = Services.generateSafeUser(updatedUser);
-
-    return response
-      .status(Constants.HttpStatusCodes.OK)
-      .json(Helpers.generateDataResponse(safeUser, "Account updated!"));
-  } catch (error) {
-    return response
-      .status(Constants.HttpStatusCodes.BAD_REQUEST)
-      .json(Helpers.generateErrorResponse(error, "Account does not exist."));
-  }
+  return Services.updateOneUser(
+    response,
+    Number(request.params.userId),
+    request.body.email,
+    request.body.username,
+    request.body.currency,
+    request.body.theme,
+    request.body.mobileNumber
+  );
 }
 
 // ========================================================================================= //
