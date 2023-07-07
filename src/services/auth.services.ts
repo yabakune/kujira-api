@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import { Response } from "express";
-import { PrismaClient, User } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 
 import * as Constants from "@/constants";
 import * as Helpers from "@/helpers";
