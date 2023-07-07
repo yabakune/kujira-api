@@ -29,9 +29,8 @@ export async function validateAccountDoesNotExist(
   } catch (error) {
     console.error(error);
     return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
-      Helpers.generateResponse({
+      Helpers.generateErrorResponse({
         body: Constants.Errors.ACCOUNT_ALREADY_EXISTS,
-        caption: Constants.Errors.CONTACT_EMAIL,
       })
     );
   }
@@ -53,9 +52,8 @@ export async function validateAccountExists(
   } catch (error) {
     console.error(error);
     return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
-      Helpers.generateResponse({
+      Helpers.generateErrorResponse({
         body: Constants.Errors.ACCOUNT_DOES_NOT_EXIST,
-        caption: Constants.Errors.CONTACT_EMAIL,
       })
     );
   }
@@ -84,9 +82,8 @@ export async function validateUserEnteredCorrectPassword(
   } catch (error) {
     console.error(error);
     return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
-      Helpers.generateResponse({
+      Helpers.generateErrorResponse({
         body: "Incorrect password. Please enter the correct password",
-        caption: Constants.Errors.CONTACT_EMAIL,
       })
     );
   }
@@ -113,9 +110,8 @@ function handleEmailCheck(
   } catch (error) {
     console.error(error);
     return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
-      Helpers.generateResponse({
+      Helpers.generateErrorResponse({
         body: `Email ${request.body.email} is already verified. Please log in.`,
-        caption: Constants.Errors.CONTACT_EMAIL,
       })
     );
   }
@@ -136,9 +132,8 @@ export async function validateEmailVerified(
   } catch (error) {
     console.error(error);
     return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
-      Helpers.generateResponse({
+      Helpers.generateErrorResponse({
         body: Constants.Errors.ACCOUNT_DOES_NOT_EXIST,
-        caption: Constants.Errors.CONTACT_EMAIL,
       })
     );
   }
@@ -168,9 +163,8 @@ function checkIfUserProvidedIncorrectVerificationCode(
   } catch (error) {
     console.error(error);
     return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
-      Helpers.generateResponse({
+      Helpers.generateErrorResponse({
         body: "Invalid verification code. Please supply the correct code.",
-        caption: Constants.Errors.CONTACT_EMAIL,
       })
     );
   }
@@ -211,9 +205,8 @@ function checkIfVerificationCodeHasExpired(
   } catch (error) {
     console.error(error);
     return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
-      Helpers.generateResponse({
+      Helpers.generateErrorResponse({
         body: "Verification code expired. Please request a new verification code.",
-        caption: Constants.Errors.CONTACT_EMAIL,
       })
     );
   }
@@ -243,9 +236,8 @@ function checkVerificationCodeEnvironmentVariableExists(
     return response
       .status(Constants.HttpStatusCodes.INTERNAL_SERVER_ERROR)
       .json(
-        Helpers.generateResponse({
+        Helpers.generateErrorResponse({
           body: "There was an error with validating your verification code.",
-          caption: Constants.Errors.CONTACT_EMAIL,
         })
       );
   }
@@ -272,9 +264,8 @@ function checkIfUserHasVerificationCode(
   } catch (error) {
     console.error(error);
     return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
-      Helpers.generateResponse({
+      Helpers.generateErrorResponse({
         body: "Account does not have a verification code. Please log in or request a new verification code.",
-        caption: Constants.Errors.CONTACT_EMAIL,
       })
     );
   }
@@ -297,9 +288,8 @@ export async function validateVerificationCode(
   } catch (error) {
     console.error(error);
     return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
-      Helpers.generateResponse({
+      Helpers.generateErrorResponse({
         body: "Failed to validate verification code. Please try again.",
-        caption: Constants.Errors.CONTACT_EMAIL,
       })
     );
   }

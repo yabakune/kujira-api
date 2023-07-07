@@ -44,9 +44,8 @@ export async function getUsers(response: Response) {
     return response
       .status(Constants.HttpStatusCodes.INTERNAL_SERVER_ERROR)
       .json(
-        Helpers.generateResponse({
+        Helpers.generateErrorResponse({
           body: "There was an error fetching accounts. Please refresh the page.",
-          caption: Constants.Errors.CONTACT_EMAIL,
         })
       );
   }
@@ -65,9 +64,8 @@ export async function getUser(response: Response, userId: number) {
   } catch (error) {
     console.error(error);
     return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
-      Helpers.generateResponse({
+      Helpers.generateErrorResponse({
         body: Constants.Errors.ACCOUNT_DOES_NOT_EXIST,
-        caption: Constants.Errors.CONTACT_EMAIL,
       })
     );
   }
@@ -106,9 +104,8 @@ export async function updateUser(
   } catch (error) {
     console.error(error);
     return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
-      Helpers.generateResponse({
+      Helpers.generateErrorResponse({
         body: Constants.Errors.ACCOUNT_DOES_NOT_EXIST,
-        caption: Constants.Errors.CONTACT_EMAIL,
       })
     );
   }
@@ -133,9 +130,8 @@ export async function updateUserPassword(
   } catch (error) {
     console.error(error);
     return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
-      Helpers.generateResponse({
+      Helpers.generateErrorResponse({
         body: "Failed to update password. Please try again.",
-        caption: Constants.Errors.CONTACT_EMAIL,
       })
     );
   }
@@ -154,9 +150,8 @@ export async function deleteUser(response: Response, userId: number) {
   } catch (error) {
     console.error(error);
     return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
-      Helpers.generateResponse({
+      Helpers.generateErrorResponse({
         body: Constants.Errors.ACCOUNT_DOES_NOT_EXIST,
-        caption: Constants.Errors.CONTACT_EMAIL,
       })
     );
   }

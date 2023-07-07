@@ -78,9 +78,8 @@ export async function registerNewUserAndEmailVerificationCode(
   } catch (error) {
     console.error(error);
     return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
-      Helpers.generateResponse({
+      Helpers.generateErrorResponse({
         body: "Failed to register new account. Please try again.",
-        caption: Constants.Errors.CONTACT_EMAIL,
       })
     );
   }
@@ -115,9 +114,8 @@ export async function loginUserAndEmailVerificationCode(
   } catch (error) {
     console.error(error);
     return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
-      Helpers.generateResponse({
+      Helpers.generateErrorResponse({
         body: "Failed to log in. Please try again.",
-        caption: Constants.Errors.CONTACT_EMAIL,
       })
     );
   }
@@ -139,14 +137,12 @@ export function generateAccessToken(
       return accessToken;
     }
   } catch (error) {
-    console.error(error);
     console.error(Constants.Errors.AUTH_SECRET_KEY_DOES_NOT_EXIST);
     return response
       .status(Constants.HttpStatusCodes.INTERNAL_SERVER_ERROR)
       .json(
-        Helpers.generateResponse({
+        Helpers.generateErrorResponse({
           body: "There was an error with authenticating your account. Please log in or request a new verification code.",
-          caption: Constants.Errors.CONTACT_EMAIL,
         })
       );
   }
@@ -195,9 +191,8 @@ export async function sendUserNewVerificationCode(
   } catch (error) {
     console.error(error);
     return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
-      Helpers.generateResponse({
+      Helpers.generateErrorResponse({
         body: "Failed to send new verification code. Please try again.",
-        caption: Constants.Errors.CONTACT_EMAIL,
       })
     );
   }

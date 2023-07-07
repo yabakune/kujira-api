@@ -22,9 +22,8 @@ function shortCircuitOnUnexpectedPayload(
   } catch (error: any) {
     console.error(error);
     return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
-      Helpers.generateResponse({
+      Helpers.generateErrorResponse({
         body: `Unexpected input: ${error.message}. Please provide the correct details.`,
-        caption: Constants.Errors.CONTACT_EMAIL,
       })
     );
   }
@@ -83,9 +82,8 @@ function validateMissingRequiredData(
   } catch (error: any) {
     console.error(error);
     return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
-      Helpers.generateResponse({
+      Helpers.generateErrorResponse({
         body: `Missing Data: ${error.message}.`,
-        caption: Constants.Errors.CONTACT_EMAIL,
       })
     );
   }

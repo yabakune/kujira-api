@@ -32,9 +32,8 @@ function handleCorrectPasswordValidation(
   } catch (error) {
     console.error(error);
     return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
-      Helpers.generateResponse({
+      Helpers.generateErrorResponse({
         body: "Incorrect old password. Please try again.",
-        caption: Constants.Errors.CONTACT_EMAIL,
       })
     );
   }
@@ -61,9 +60,8 @@ export async function validateCorrectOldPassword(
   } catch (error) {
     console.error(error);
     return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
-      Helpers.generateResponse({
+      Helpers.generateErrorResponse({
         body: Constants.Errors.ACCOUNT_DOES_NOT_EXIST,
-        caption: Constants.Errors.CONTACT_EMAIL,
       })
     );
   }
@@ -89,9 +87,8 @@ function handleNewPasswordValidation(
   } catch (error) {
     console.error(error);
     return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
-      Helpers.generateResponse({
+      Helpers.generateErrorResponse({
         body: "Please enter a unique new password.",
-        caption: Constants.Errors.CONTACT_EMAIL,
       })
     );
   }
@@ -119,9 +116,8 @@ export async function validateNewPasswordIsNotSameAsPreviousPassword(
   } catch (error) {
     console.error(error);
     return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
-      Helpers.generateResponse({
+      Helpers.generateErrorResponse({
         body: Constants.Errors.ACCOUNT_DOES_NOT_EXIST,
-        caption: Constants.Errors.CONTACT_EMAIL,
       })
     );
   }

@@ -29,9 +29,8 @@ export async function register(
     return response
       .status(Constants.HttpStatusCodes.INTERNAL_SERVER_ERROR)
       .json(
-        Helpers.generateResponse({
+        Helpers.generateErrorResponse({
           body: "Failed to register your account. Please refresh the page and try again.",
-          caption: Constants.Errors.CONTACT_EMAIL,
         })
       );
   }
@@ -55,9 +54,8 @@ export async function login(
     return response
       .status(Constants.HttpStatusCodes.INTERNAL_SERVER_ERROR)
       .json(
-        Helpers.generateResponse({
+        Helpers.generateErrorResponse({
           body: "Failed to log in. Please refresh the page and try again.",
-          caption: Constants.Errors.CONTACT_EMAIL,
         })
       );
   }
@@ -95,9 +93,8 @@ export async function verifyRegistration(
     return response
       .status(Constants.HttpStatusCodes.INTERNAL_SERVER_ERROR)
       .json(
-        Helpers.generateResponse({
+        Helpers.generateErrorResponse({
           body: "Failed to verify registration. Please try again.",
-          caption: Constants.Errors.CONTACT_EMAIL,
         })
       );
   }
@@ -139,9 +136,8 @@ export async function verifyLogin(
     return response
       .status(Constants.HttpStatusCodes.INTERNAL_SERVER_ERROR)
       .json(
-        Helpers.generateResponse({
+        Helpers.generateErrorResponse({
           body: "Failed to verify login. Please try again.",
-          caption: Constants.Errors.CONTACT_EMAIL,
         })
       );
   }
@@ -170,9 +166,8 @@ export async function sendNewVerificationCode(
   } catch (error) {
     console.error(error);
     return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
-      Helpers.generateResponse({
+      Helpers.generateErrorResponse({
         body: "Failed to create new registration code. Please try again.",
-        caption: Constants.Errors.CONTACT_EMAIL,
       })
     );
   }
