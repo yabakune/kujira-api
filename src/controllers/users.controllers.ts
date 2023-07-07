@@ -107,7 +107,7 @@ export async function updateUserPassword(
     const encryptedPassword = await Helpers.encryptPassword(
       request.body.newPassword
     );
-    const data: Validators.UserUpdatePasswordValidator = {
+    const data: Validators.UpdatePasswordValidator = {
       password: encryptedPassword,
     };
     await prisma.user.update({
