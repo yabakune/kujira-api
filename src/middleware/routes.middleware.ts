@@ -44,15 +44,18 @@ function shortCircuitOnUnexpectedPayload(
   }
 }
 
-function generateMissingClientData(
+function generateMissingRequiredData(
   suppliedClientPayload: string[],
-  expectedClientPayload: string[]
+  requiredData?: string[]
 ) {
-  const missingClientData = expectedClientPayload.filter(
-    (data: string) => !suppliedClientPayload.includes(data)
-  );
-
-  return missingClientData;
+  if (requiredData) {
+    const missingClientData = requiredData?.filter(
+      (data: string) => !suppliedClientPayload.includes(data)
+    );
+    return missingClientData;
+  } else {
+    return [];
+  }
 }
 
 type ExpectedClientPayload = {
@@ -74,9 +77,10 @@ export function verifyClientPayload(
       optionalData
     );
 
-    const missingRequiredData = requiredData
-      ? generateMissingClientData(suppliedClientPayload, requiredData)
-      : [];
+    const missingRequiredData = generateMissingRequiredData(
+      suppliedClientPayload,
+      requiredData
+    );
 
     const missingOptionalData = optionalData
       ? generateMissingClientData(suppliedClientPayload, optionalData)
