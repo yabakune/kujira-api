@@ -130,7 +130,7 @@ export async function deleteUser(
       where: { id: Number(request.params.userId) },
     });
     return response
-      .status(Constants.HttpStatusCodes.NO_CONTENT)
+      .status(Constants.HttpStatusCodes.OK)
       .json(Helpers.generateDataResponse(id, "Account deleted!"));
   } catch (error) {
     return response
