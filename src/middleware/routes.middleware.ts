@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from "express";
+import jwt, { JwtPayload } from "jsonwebtoken";
 
 import * as Constants from "@/constants";
 import * as Helpers from "@/helpers";
@@ -115,43 +116,59 @@ export function verifyClientPayload(
 }
 
 // ========================================================================================= //
-// [ VERIFIES JWT ACCESS TOKEN ] =========================================================== //
+// [ MIDDLEWARE THAT GATES ACCESS TO ROUTES THAT REQUIRE AUTHORIZED ACCESS ] =============== //
 // ========================================================================================= //
 
-// ↓↓↓ Middleware that authenticates user actions via a JWT access token. ↓↓↓ //
-// ↓↓↓ Checks if there is a valid access token (e.g. it exists or supplies the correct secret key). ↓↓↓ //
-// ↓↓↓ If not, user is not authorized to make an action. ↓↓↓ //
-//
-// ↓↓↓ This middleware is performed before hitting any endpoint that requires validation credentials. ↓↓↓ //
-// type RequestWithAccessToken = { accessToken: string | JwtPayload } & Request;
+type RequestWithAccessToken = Request & { accessToken: string | JwtPayload };
 
-// export async function verifyAccessToken(
-//   request: Request,
-//   response: Response,
-//   next: NextFunction
-// ) {
-//   try {
-//     return Helpers.handleSecretKeysExist(
-//       response,
-//       function (_: string, authSecretKey: string) {
-//         const accessToken = request.header("authorization");
+function validateAccessTokenExists(
+  request: Request,
+  response: Response,
+  next: NextFunction,
+  authSecretKey: string
+) {
+  try {
+    const accessToken = request.header("authorization");
 
-//         if (!accessToken) {
-//           return HttpHelpers.respondWithClientError(response, "unauthorized", {
-//             body: "Unauthorized access.",
-//           });
-//         } else {
-//           const decodedAccessToken = jwt.verify(accessToken, authSecretKey);
-//           // ↓↓↓ Appending our decoded access token to Express's `request` object for use. ↓↓↓ //
-//           // ↓↓↓ in the action the user wanted to perform. ↓↓↓ //
-//           (request as RequestWithAccessToken).accessToken = decodedAccessToken;
-//           return next();
-//         }
-//       }
-//     );
-//   } catch (error) {
-//     return HttpHelpers.respondWithClientError(response, "unauthorized", {
-//       body: "Unauthorized access.",
-//     });
-//   }
-// }
+    if (!accessToken) {
+      throw new Error();
+    } else {
+      const decodedAccessToken = jwt.verify(accessToken, authSecretKey);
+      // ↓↓↓ Appending decoded access token to Express's `request` object to use in the action user wanted to perform. ↓↓↓ //
+      (request as RequestWithAccessToken).accessToken = decodedAccessToken;
+      return next();
+    }
+  } catch (error) {
+    console.error(error);
+    return response.status(Constants.HttpStatusCodes.FORBIDDEN).json(
+      Helpers.generateErrorResponse({
+        body: "Unauthorized access. Please register or log in.",
+      })
+    );
+  }
+}
+
+export async function validateAuthorizedUser(
+  request: Request,
+  response: Response,
+  next: NextFunction
+) {
+  try {
+    const authSecretKey = process.env.AUTH_SECRET_KEY;
+
+    if (!authSecretKey) {
+      throw new Error();
+    } else {
+      return validateAccessTokenExists(request, response, next, authSecretKey);
+    }
+  } catch (error) {
+    console.error(Constants.Errors.AUTH_SECRET_KEY_DOES_NOT_EXIST);
+    return response
+      .status(Constants.HttpStatusCodes.INTERNAL_SERVER_ERROR)
+      .json(
+        Helpers.generateErrorResponse({
+          body: "There was an error of unknown origin. Please refresh the page.",
+        })
+      );
+  }
+}
