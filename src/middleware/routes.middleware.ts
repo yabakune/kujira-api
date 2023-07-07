@@ -74,11 +74,11 @@ function shortCircuitOnMissingRequiredData(
       return;
     }
   } catch (error: any) {
-    return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
-      Helpers.generateTextResponse({
-        body: `Missing Data: ${error.message}.`,
-      })
-    );
+    return response
+      .status(Constants.HttpStatusCodes.BAD_REQUEST)
+      .json(
+        Helpers.generateErrorResponse(error, `Missing Data: ${error.message}.`)
+      );
   }
 }
 
