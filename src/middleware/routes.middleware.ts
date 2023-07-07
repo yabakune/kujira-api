@@ -3,6 +3,49 @@ import { NextFunction, Request, Response } from "express";
 import * as Constants from "@/constants";
 import * as Helpers from "@/helpers";
 
+// ========================================================================================= //
+// [ MAKING SURE THE CLIENT SENT THE CORRECT DATA TO THE API ] ============================= //
+// ========================================================================================= //
+
+function shortCircuitOnIncorrectPayload(
+  response: Response,
+  suppliedClientPayload: string[],
+  expectedClientPayload: string[]
+) {
+  try {
+    for (const suppliedPayload in suppliedClientPayload) {
+      if (!expectedClientPayload.includes(suppliedPayload)) {
+        throw new Error();
+      }
+    }
+  } catch (error) {
+    return response
+      .status(Constants.HttpStatusCodes.BAD_REQUEST)
+      .json(Helpers.generateErrorResponse(error, "Unacceptable input."));
+  }
+}
+
+function handleShortCircuitOnUnacceptableClientPayload(
+  response: Response,
+  suppliedClientPayload: string[],
+  requiredData?: string[],
+  optionalData?: string[]
+) {
+  if (requiredData && requiredData.length > 0) {
+    shortCircuitOnIncorrectPayload(
+      response,
+      suppliedClientPayload,
+      requiredData
+    );
+  } else if (optionalData && optionalData.length > 0) {
+    shortCircuitOnIncorrectPayload(
+      response,
+      suppliedClientPayload,
+      optionalData
+    );
+  }
+}
+
 function generateMissingClientData(
   suppliedClientPayload: string[],
   expectedClientPayload: string[]
@@ -25,6 +68,13 @@ export function verifyClientPayload(
   return (request: Request, response: Response, next: NextFunction) => {
     const suppliedClientPayload = Object.keys(request.body); // Data sent from the client.
     const { requiredData, optionalData } = expectedClientPayload;
+
+    handleShortCircuitOnUnacceptableClientPayload(
+      response,
+      suppliedClientPayload,
+      requiredData,
+      optionalData
+    );
 
     const missingRequiredData = requiredData
       ? generateMissingClientData(suppliedClientPayload, requiredData)
