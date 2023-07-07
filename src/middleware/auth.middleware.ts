@@ -100,7 +100,7 @@ export async function checkUserEnteredCorrectPassword(
   }
 }
 
-function checkJWTExpired(jsonWebToken: string, secretKey: string): boolean {
+function _checkJWTExpired(jsonWebToken: string, secretKey: string): boolean {
   let isExpired = false;
   jwt.verify(jsonWebToken, secretKey, function <Error>(error: Error) {
     if (error) isExpired = true;
@@ -108,7 +108,7 @@ function checkJWTExpired(jsonWebToken: string, secretKey: string): boolean {
   return isExpired;
 }
 
-function handleVerificationCodeAuth(
+function _handleVerificationCodeAuth(
   request: Request,
   response: Response,
   next: NextFunction,
@@ -119,7 +119,7 @@ function handleVerificationCodeAuth(
     if (!secretKey) {
       throw new Error();
     } else {
-      const verificationCodeHasExpired = checkJWTExpired(
+      const verificationCodeHasExpired = _checkJWTExpired(
         verificationCodeInDatabase,
         secretKey
       );
@@ -176,7 +176,7 @@ export async function checkSubmittedVerificationCode(
         })
       );
     } else {
-      return handleVerificationCodeAuth(
+      return _handleVerificationCodeAuth(
         request,
         response,
         next,
