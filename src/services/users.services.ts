@@ -49,3 +49,20 @@ export async function fetchAllUsers(response: Response) {
       );
   }
 }
+
+export async function fetchOneUser(response: Response, userId: number) {
+  try {
+    const user = await prisma.user.findUniqueOrThrow({
+      where: { id: userId },
+    });
+    const safeUser = generateSafeUser(user);
+
+    return response
+      .status(Constants.HttpStatusCodes.OK)
+      .json(Helpers.generateDataResponse(safeUser));
+  } catch (error) {
+    return response
+      .status(Constants.HttpStatusCodes.BAD_REQUEST)
+      .json(Helpers.generateErrorResponse(error, "Account does not exist."));
+  }
+}

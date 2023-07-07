@@ -24,20 +24,7 @@ export async function getUser(
   request: Request<{ userId: string }>,
   response: Response
 ) {
-  try {
-    const user = await prisma.user.findUniqueOrThrow({
-      where: { id: Number(request.params.userId) },
-    });
-    const safeUser = Services.generateSafeUser(user);
-
-    return response
-      .status(Constants.HttpStatusCodes.OK)
-      .json(Helpers.generateDataResponse(safeUser));
-  } catch (error) {
-    return response
-      .status(Constants.HttpStatusCodes.BAD_REQUEST)
-      .json(Helpers.generateErrorResponse(error, "Account does not exist."));
-  }
+  return Services.fetchOneUser(response, Number(request.params.userId));
 }
 
 // ========================================================================================= //
