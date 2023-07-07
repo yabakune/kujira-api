@@ -29,7 +29,7 @@ export async function validateUserExists(
       .json(
         Helpers.generateErrorResponse(
           error,
-          "A user with that email doesn't exist"
+          "A user with that email doesn't exist."
         )
       );
   }
