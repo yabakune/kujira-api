@@ -1,9 +1,5 @@
 import { User } from "@prisma/client";
 
-// ========================================================================================= //
-// [ EXCLUDING FIELDS FROM RETRIEVED USER OBJECT(S) ] ====================================== //
-// ========================================================================================= //
-
 function excludeFieldFromUsersObject<User, Field extends keyof User>(
   users: User[],
   fields: Field[]
