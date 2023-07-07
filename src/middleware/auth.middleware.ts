@@ -20,7 +20,7 @@ export async function validateAccountDoesNotExist(
     const user = await prisma.user.findUnique({
       where: { email: request.body.email },
     });
-    
+
     if (user) {
       throw new Error();
     } else {
@@ -32,7 +32,7 @@ export async function validateAccountDoesNotExist(
       .json(
         Helpers.generateErrorResponse(
           error,
-          "An account with that email already exists."
+          Constants.Errors.ACCOUNT_ALREADY_EXISTS
         )
       );
   }
@@ -57,7 +57,7 @@ export async function validateAccountExists(
       .json(
         Helpers.generateErrorResponse(
           error,
-          "An account with that email doesn't exist."
+          Constants.Errors.ACCOUNT_DOES_NOT_EXIST
         )
       );
   }
@@ -241,9 +241,7 @@ function checkVerificationCodeEnvironmentVariableExists(
       );
     }
   } catch (error) {
-    console.log(
-      "VERIFICATION_CODE_SECRET_KEY environment variable does not exist."
-    );
+    console.log(Constants.Errors.VERIFICATION_CODE_SECRET_KEY_DOES_NOT_EXIST);
     return response
       .status(Constants.HttpStatusCodes.INTERNAL_SERVER_ERROR)
       .json(

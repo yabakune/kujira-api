@@ -1,5 +1,7 @@
 import { Prisma } from "@prisma/client";
 
+import * as Constants from "@/constants"
+
 type DataResponse<Response> = {
   response: Response;
   success?: string;
@@ -64,6 +66,6 @@ export function generateErrorResponse<Error>(
 
   return {
     error: errorMessage,
-    caption: "If the issue persists, please contact kujira.help@outlook.com.",
+    caption: Constants.Errors.CONTACT_EMAIL,
   };
 }

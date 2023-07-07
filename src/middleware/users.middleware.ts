@@ -62,7 +62,12 @@ export async function validateCorrectOldPassword(
   } catch (error) {
     return response
       .status(Constants.HttpStatusCodes.BAD_REQUEST)
-      .json(Helpers.generateErrorResponse(error, "Account does not exist."));
+      .json(
+        Helpers.generateErrorResponse(
+          error,
+          Constants.Errors.ACCOUNT_DOES_NOT_EXIST
+        )
+      );
   }
 }
 
@@ -117,6 +122,11 @@ export async function validateNewPasswordIsNotSameAsPreviousPassword(
   } catch (error) {
     return response
       .status(Constants.HttpStatusCodes.BAD_REQUEST)
-      .json(Helpers.generateErrorResponse(error, "Account does not exist."));
+      .json(
+        Helpers.generateErrorResponse(
+          error,
+          Constants.Errors.ACCOUNT_DOES_NOT_EXIST
+        )
+      );
   }
 }

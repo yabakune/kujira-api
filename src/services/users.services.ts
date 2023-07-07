@@ -64,7 +64,12 @@ export async function getUser(response: Response, userId: number) {
   } catch (error) {
     return response
       .status(Constants.HttpStatusCodes.BAD_REQUEST)
-      .json(Helpers.generateErrorResponse(error, "Account does not exist."));
+      .json(
+        Helpers.generateErrorResponse(
+          error,
+          Constants.Errors.ACCOUNT_DOES_NOT_EXIST
+        )
+      );
   }
 }
 
@@ -98,7 +103,12 @@ export async function updateUser(
   } catch (error) {
     return response
       .status(Constants.HttpStatusCodes.BAD_REQUEST)
-      .json(Helpers.generateErrorResponse(error, "Account does not exist."));
+      .json(
+        Helpers.generateErrorResponse(
+          error,
+          Constants.Errors.ACCOUNT_DOES_NOT_EXIST
+        )
+      );
   }
 }
 
@@ -136,6 +146,11 @@ export async function deleteUser(response: Response, userId: number) {
   } catch (error) {
     return response
       .status(Constants.HttpStatusCodes.BAD_REQUEST)
-      .json(Helpers.generateErrorResponse(error, "Account does not exist."));
+      .json(
+        Helpers.generateErrorResponse(
+          error,
+          Constants.Errors.ACCOUNT_DOES_NOT_EXIST
+        )
+      );
   }
 }

@@ -39,9 +39,7 @@ function generateAuthVerificationCodes() {
     );
     return { verificationCode, decodedVerificationCode };
   } else {
-    console.log(
-      "VERIFICATION_CODE_SECRET_KEY environment variable does not exist."
-    );
+    console.log(Constants.Errors.VERIFICATION_CODE_SECRET_KEY_DOES_NOT_EXIST);
     throw new Error();
   }
 }
@@ -121,7 +119,7 @@ export async function loginUserAndEmailVerificationCode(
       .json(
         Helpers.generateErrorResponse(
           error,
-          "Failed to login. Please try again."
+          "Failed to log in. Please try again."
         )
       );
   }
@@ -143,7 +141,7 @@ export function generateAccessToken(
       return accessToken;
     }
   } catch (error) {
-    console.log("AUTH_SECRET_KEY environment variable does not exist.");
+    console.log(Constants.Errors.AUTH_SECRET_KEY_DOES_NOT_EXIST);
     return response
       .status(Constants.HttpStatusCodes.INTERNAL_SERVER_ERROR)
       .json(
