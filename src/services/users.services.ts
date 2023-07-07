@@ -124,3 +124,18 @@ export async function updateUserPassword(
       .json(Helpers.generateErrorResponse(error));
   }
 }
+
+export async function deleteUser(response: Response, userId: number) {
+  try {
+    const { id } = await prisma.user.delete({
+      where: { id: userId },
+    });
+    return response
+      .status(Constants.HttpStatusCodes.OK)
+      .json(Helpers.generateDataResponse(id, "Account deleted!"));
+  } catch (error) {
+    return response
+      .status(Constants.HttpStatusCodes.BAD_REQUEST)
+      .json(Helpers.generateErrorResponse(error, "Account does not exist."));
+  }
+}

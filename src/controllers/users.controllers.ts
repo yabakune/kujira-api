@@ -1,12 +1,7 @@
 import { Request, Response } from "express";
-import { PrismaClient } from "@prisma/client";
 
-import * as Constants from "@/constants";
-import * as Helpers from "@/helpers";
 import * as Services from "@/services";
 import * as Validators from "@/validators";
-
-const prisma = new PrismaClient();
 
 // ========================================================================================= //
 // [ FETCH All USERS ] ===================================================================== //
@@ -69,16 +64,5 @@ export async function deleteUser(
   request: Request<{ userId: string }>,
   response: Response
 ) {
-  try {
-    const { id } = await prisma.user.delete({
-      where: { id: Number(request.params.userId) },
-    });
-    return response
-      .status(Constants.HttpStatusCodes.OK)
-      .json(Helpers.generateDataResponse(id, "Account deleted!"));
-  } catch (error) {
-    return response
-      .status(Constants.HttpStatusCodes.BAD_REQUEST)
-      .json(Helpers.generateErrorResponse(error, "Account does not exist."));
-  }
+  return Services.deleteUser(response, Number(request.params.userId));
 }
