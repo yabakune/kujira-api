@@ -7,7 +7,7 @@ import * as Helpers from "@/helpers";
 // [ MAKING SURE THE CLIENT SENT THE CORRECT DATA TO THE API ] ============================= //
 // ========================================================================================= //
 
-function handleShortCircuit(
+function shortCircuitOnUnexpectedPayload(
   response: Response,
   suppliedClientPayload: string[],
   expectedClientPayload: string[]
@@ -31,16 +31,24 @@ function handleShortCircuit(
   }
 }
 
-function shortCircuitOnUnexpectedPayload(
+function checkUnexpectedPayload(
   response: Response,
   suppliedClientPayload: string[],
   requiredData?: string[],
   optionalData?: string[]
 ) {
   if (requiredData && requiredData.length > 0) {
-    handleShortCircuit(response, suppliedClientPayload, requiredData);
+    shortCircuitOnUnexpectedPayload(
+      response,
+      suppliedClientPayload,
+      requiredData
+    );
   } else if (optionalData && optionalData.length > 0) {
-    handleShortCircuit(response, suppliedClientPayload, optionalData);
+    shortCircuitOnUnexpectedPayload(
+      response,
+      suppliedClientPayload,
+      optionalData
+    );
   }
 }
 
@@ -58,7 +66,7 @@ function generateMissingRequiredData(
   }
 }
 
-function shortCircuitOnMissingRequiredData(
+function checkMissingRequiredData(
   response: Response,
   suppliedClientPayload: string[],
   requiredData?: string[]
@@ -94,18 +102,14 @@ export function verifyClientPayload(
     const suppliedClientPayload = Object.keys(request.body); // Data sent from the client.
     const { requiredData, optionalData } = expectedClientPayload;
 
-    shortCircuitOnUnexpectedPayload(
+    checkUnexpectedPayload(
       response,
       suppliedClientPayload,
       requiredData,
       optionalData
     );
 
-    shortCircuitOnMissingRequiredData(
-      response,
-      suppliedClientPayload,
-      requiredData
-    );
+    checkMissingRequiredData(response, suppliedClientPayload, requiredData);
 
     return next();
   };
