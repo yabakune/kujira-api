@@ -9,7 +9,7 @@ import * as Validators from "@/validators";
 
 const prisma = new PrismaClient();
 
-function _generateVerificationCode(secretKey: string): string {
+function generateVerificationCode(secretKey: string): string {
   let code = "";
   for (let i = 0; i < 8; i++) {
     code += Math.floor(Math.random() * 10);
@@ -29,10 +29,10 @@ export function decodeVerificationCode(
   return code;
 }
 
-function _generateAuthVerificationCodes() {
+function generateAuthVerificationCodes() {
   const secretKey = process.env.VERIFICATION_CODE_SECRET_KEY;
   if (secretKey) {
-    const verificationCode = _generateVerificationCode(secretKey);
+    const verificationCode = generateVerificationCode(secretKey);
     const decodedVerificationCode = decodeVerificationCode(
       verificationCode,
       secretKey
@@ -54,7 +54,7 @@ export async function registerNewUserAndEmailVerificationCode(
 ) {
   try {
     const { verificationCode, decodedVerificationCode } =
-      _generateAuthVerificationCodes();
+      generateAuthVerificationCodes();
 
     const data: Validators.RegistrationValidator = {
       email,
@@ -62,7 +62,6 @@ export async function registerNewUserAndEmailVerificationCode(
       password,
       verificationCode,
     };
-
     await prisma.user.create({ data });
 
     await Helpers.emailUser(email, "Kujira: Confirm Registration", [
@@ -90,59 +89,13 @@ export async function registerNewUserAndEmailVerificationCode(
   }
 }
 
-export function generateAccessToken(
-  userId: number,
-  authSecretKey: string,
-  thirtyDayExpiration: boolean = false
-) {
-  const accessToken = jwt.sign({ _id: userId.toString() }, authSecretKey, {
-    expiresIn: thirtyDayExpiration ? "30 days" : "7 days",
-  });
-  return accessToken;
-}
-
-type AuthVerificationPayload = {
-  verifiedUser: User;
-  accessToken: string;
-};
-
-export async function verifyAuthWithToken(
-  type: "Verifying Registration" | "Verifying Login",
-  email: string,
-  thirtyDays?: boolean
-): Promise<AuthVerificationPayload> {
-  const verifiedUser =
-    type === "Verifying Registration"
-      ? await prisma.user.update({
-          where: { email },
-          data: { verificationCode: null, emailVerified: true },
-        })
-      : await prisma.user.update({
-          where: { email },
-          data: { verificationCode: null },
-        });
-
-  const authSecretKey = process.env.AUTH_SECRET_KEY;
-  if (authSecretKey) {
-    const accessToken = generateAccessToken(
-      verifiedUser.id,
-      authSecretKey,
-      true
-    );
-    return { verifiedUser, accessToken };
-  } else {
-    console.log("AUTH_SECRET_KEY environment variable does not exist.");
-    throw new Error();
-  }
-}
-
 export async function loginUserAndEmailVerificationCode(
   response: Response,
   email: string
 ) {
   try {
     const { verificationCode, decodedVerificationCode } =
-      _generateAuthVerificationCodes();
+      generateAuthVerificationCodes();
 
     await prisma.user.update({
       where: { email },
@@ -150,7 +103,7 @@ export async function loginUserAndEmailVerificationCode(
     });
 
     await Helpers.emailUser(email, "Kujira: Confirm Login", [
-      "Welcome back! I missed you :'D",
+      "Welcome back!",
       `Please copy and paste the following verification code into the app to verify your registration: ${decodedVerificationCode}`,
       "If this is a mistake, you can safely ignore this email.",
     ]);
@@ -174,13 +127,59 @@ export async function loginUserAndEmailVerificationCode(
   }
 }
 
-export async function updateAndEmailUserWithNewVerificationCode(
+export function generateAccessToken(
+  response: Response,
+  userId: number,
+  thirtyDayExpiration: boolean = false
+) {
+  try {
+    const authSecretKey = process.env.AUTH_SECRET_KEY;
+    if (!authSecretKey) {
+      throw new Error();
+    } else {
+      const accessToken = jwt.sign({ _id: userId.toString() }, authSecretKey, {
+        expiresIn: thirtyDayExpiration ? "30 days" : "7 days",
+      });
+      return accessToken;
+    }
+  } catch (error) {
+    console.log("AUTH_SECRET_KEY environment variable does not exist.");
+    return response
+      .status(Constants.HttpStatusCodes.INTERNAL_SERVER_ERROR)
+      .json(
+        Helpers.generateErrorResponse(
+          error,
+          "There was an error with authentication. Please log in or request a new verification code."
+        )
+      );
+  }
+}
+
+export async function generateVerifiedUser(
+  type: "Verifying Registration" | "Verifying Login",
+  email: string
+) {
+  const verifiedUser =
+    type === "Verifying Registration"
+      ? await prisma.user.update({
+          where: { email },
+          data: { verificationCode: null, emailVerified: true },
+        })
+      : await prisma.user.update({
+          where: { email },
+          data: { verificationCode: null },
+        });
+
+  return verifiedUser;
+}
+
+export async function sendUserNewVerificationCode(
   response: Response,
   email: string
 ) {
   try {
     const { verificationCode, decodedVerificationCode } =
-      _generateAuthVerificationCodes();
+      generateAuthVerificationCodes();
 
     const userWithNewVerificationCode = await prisma.user.update({
       where: { email },

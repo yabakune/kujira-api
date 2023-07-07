@@ -10,38 +10,10 @@ import * as Validators from "@/validators";
 
 const prisma = new PrismaClient();
 
+// ↓↓↓ Adding our found user to the middleware chain so we don't have to search for it with every step. ↓↓↓ //
 type AttachedUserFromPreviousMiddleware = {
   attachedUserFromPreviousMiddleware?: User;
 };
-
-export async function validateEmailVerified(
-  request: Request<{}, {}, { email: string }> &
-    AttachedUserFromPreviousMiddleware,
-  response: Response,
-  next: NextFunction
-) {
-  try {
-    const user = await prisma.user.findUniqueOrThrow({
-      where: { email: request.body.email },
-    });
-    if (user.emailVerified) {
-      throw new Error();
-    } else {
-      // ↓↓↓ Adding our found user to the middleware chain so we don't have to search for it with every step. ↓↓↓ //
-      request.attachedUserFromPreviousMiddleware = user;
-      return next();
-    }
-  } catch (error) {
-    return response
-      .status(Constants.HttpStatusCodes.BAD_REQUEST)
-      .json(
-        Helpers.generateErrorResponse(
-          error,
-          `Email ${request.body.email} is already verified. Please log in.`
-        )
-      );
-  }
-}
 
 export async function validateUserExists(
   request: Request<{}, {}, { email: string }> &
@@ -79,20 +51,64 @@ export async function validateUserEnteredCorrectPassword(
       (await prisma.user.findUniqueOrThrow({
         where: { email: request.body.email },
       }));
+
     const passwordsMatch = bcrypt.compareSync(
       request.body.password,
       user.password
     );
 
-    if (passwordsMatch) {
-      return next();
-    } else {
-      return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
-        Helpers.generateTextResponse({
-          body: "Password incorrect. Please enter the correct password",
-        })
+    if (passwordsMatch) return next();
+    else throw new Error();
+  } catch (error) {
+    return response
+      .status(Constants.HttpStatusCodes.BAD_REQUEST)
+      .json(
+        Helpers.generateErrorResponse(
+          error,
+          "Password incorrect. Please enter the correct password"
+        )
       );
+  }
+}
+
+function handleEmailCheck(
+  request: Request<{}, {}, { email: string }> &
+    AttachedUserFromPreviousMiddleware,
+  response: Response,
+  next: NextFunction,
+  user: User
+) {
+  try {
+    if (user.emailVerified) {
+      throw new Error();
+    } else {
+      request.attachedUserFromPreviousMiddleware = user;
+      return next();
     }
+  } catch (error) {
+    return response
+      .status(Constants.HttpStatusCodes.BAD_REQUEST)
+      .json(
+        Helpers.generateErrorResponse(
+          error,
+          `Email ${request.body.email} is already verified. Please log in.`
+        )
+      );
+  }
+}
+
+export async function validateEmailVerified(
+  request: Request<{}, {}, { email: string }> &
+    AttachedUserFromPreviousMiddleware,
+  response: Response,
+  next: NextFunction
+) {
+  try {
+    const user = await prisma.user.findUniqueOrThrow({
+      where: { email: request.body.email },
+    });
+
+    return handleEmailCheck(request, response, next, user);
   } catch (error) {
     return response
       .status(Constants.HttpStatusCodes.BAD_REQUEST)
@@ -100,7 +116,33 @@ export async function validateUserEnteredCorrectPassword(
   }
 }
 
-function _checkJWTExpired(jsonWebToken: string, secretKey: string): boolean {
+function checkIfUserProvidedIncorrectVerificationCode(
+  response: Response,
+  next: NextFunction,
+  secretKey: string,
+  verificationCodeInDatabase: string,
+  verificationCodeProvidedByClient: string
+) {
+  try {
+    const userProvidedIncorrectVerificationCode =
+      Services.decodeVerificationCode(verificationCodeInDatabase, secretKey) !==
+      verificationCodeProvidedByClient;
+
+    if (userProvidedIncorrectVerificationCode) throw new Error();
+    else return next();
+  } catch (error) {
+    return response
+      .status(Constants.HttpStatusCodes.BAD_REQUEST)
+      .json(
+        Helpers.generateErrorResponse(
+          error,
+          "Invalid verification code. Please supply the correct code."
+        )
+      );
+  }
+}
+
+function checkJWTExpired(jsonWebToken: string, secretKey: string): boolean {
   let isExpired = false;
   jwt.verify(jsonWebToken, secretKey, function <Error>(error: Error) {
     if (error) isExpired = true;
@@ -108,7 +150,43 @@ function _checkJWTExpired(jsonWebToken: string, secretKey: string): boolean {
   return isExpired;
 }
 
-function _handleVerificationCodeAuth(
+function checkIfVerificationCodeHasExpired(
+  response: Response,
+  next: NextFunction,
+  secretKey: string,
+  verificationCodeInDatabase: string,
+  verificationCodeProvidedByClient: string
+) {
+  try {
+    const verificationCodeHasExpired = checkJWTExpired(
+      verificationCodeInDatabase,
+      secretKey
+    );
+
+    if (verificationCodeHasExpired) {
+      throw new Error();
+    } else {
+      return checkIfUserProvidedIncorrectVerificationCode(
+        response,
+        next,
+        secretKey,
+        verificationCodeInDatabase,
+        verificationCodeProvidedByClient
+      );
+    }
+  } catch (error) {
+    return response
+      .status(Constants.HttpStatusCodes.BAD_REQUEST)
+      .json(
+        Helpers.generateErrorResponse(
+          error,
+          "Verification code expired. Please request a new verification code."
+        )
+      );
+  }
+}
+
+function checkVerificationCodeEnvironmentVariableExists(
   request: Request,
   response: Response,
   next: NextFunction,
@@ -119,31 +197,13 @@ function _handleVerificationCodeAuth(
     if (!secretKey) {
       throw new Error();
     } else {
-      const verificationCodeHasExpired = _checkJWTExpired(
+      return checkIfVerificationCodeHasExpired(
+        response,
+        next,
+        secretKey,
         verificationCodeInDatabase,
-        secretKey
+        request.body.verificationCode
       );
-      const userProvidedIncorrectVerificationCode =
-        Services.decodeVerificationCode(
-          verificationCodeInDatabase,
-          secretKey
-        ) !== request.body.verificationCode;
-
-      if (verificationCodeHasExpired) {
-        return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
-          Helpers.generateTextResponse({
-            body: "Verification code expired. Please request a new verification code.",
-          })
-        );
-      } else if (userProvidedIncorrectVerificationCode) {
-        return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
-          Helpers.generateTextResponse({
-            body: "Invalid verification code. Please supply the correct code.",
-          })
-        );
-      } else {
-        return next();
-      }
     }
   } catch (error) {
     console.log(
@@ -160,7 +220,37 @@ function _handleVerificationCodeAuth(
   }
 }
 
-export async function validateSubmittedVerificationCode(
+function checkIfUserHasVerificationCode(
+  request: Request<{}, {}, Validators.VerificationCodeValidator> &
+    AttachedUserFromPreviousMiddleware,
+  response: Response,
+  next: NextFunction,
+  user: User
+) {
+  try {
+    if (!user.verificationCode) {
+      throw new Error();
+    } else {
+      return checkVerificationCodeEnvironmentVariableExists(
+        request,
+        response,
+        next,
+        user.verificationCode
+      );
+    }
+  } catch (error) {
+    return response
+      .status(Constants.HttpStatusCodes.BAD_REQUEST)
+      .json(
+        Helpers.generateErrorResponse(
+          error,
+          "Account does not have a verification code. Please log in or request a new verification code."
+        )
+      );
+  }
+}
+
+export async function validateVerificationCode(
   request: Request<{}, {}, Validators.VerificationCodeValidator> &
     AttachedUserFromPreviousMiddleware,
   response: Response,
@@ -173,25 +263,10 @@ export async function validateSubmittedVerificationCode(
         where: { email: request.body.email },
       }));
 
-    if (!user.verificationCode) {
-      return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
-        Helpers.generateTextResponse({
-          title: "Account does not have a verification code.",
-          body: "Please log in or request a new verification code.",
-        })
-      );
-    } else {
-      return _handleVerificationCodeAuth(
-        request,
-        response,
-        next,
-        user.verificationCode
-      );
-    }
+    return checkIfUserHasVerificationCode(request, response, next, user);
   } catch (error) {
-    console.log("validateSubmittedVerificationCode() Error:", error);
     return response
-      .status(Constants.HttpStatusCodes.INTERNAL_SERVER_ERROR)
+      .status(Constants.HttpStatusCodes.BAD_REQUEST)
       .json(Helpers.generateErrorResponse(error));
   }
 }

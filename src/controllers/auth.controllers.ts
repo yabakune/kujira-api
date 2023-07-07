@@ -33,37 +33,6 @@ export async function register(
 }
 
 // ========================================================================================= //
-// [ VERIFY REGISTRATION ] ================================================================= //
-// ========================================================================================= //
-
-export async function verifyRegistration(
-  request: Request<{}, {}, Validators.VerificationCodeValidator>,
-  response: Response
-) {
-  try {
-    const { verifiedUser, accessToken } = await Services.verifyAuthWithToken(
-      "Verifying Registration",
-      request.body.email
-    );
-
-    const safeUser = Services.generateSafeUser(verifiedUser);
-
-    return response
-      .status(Constants.HttpStatusCodes.OK)
-      .json(
-        Helpers.generateDataResponse(
-          { safeUser, accessToken },
-          "Email verified!"
-        )
-      );
-  } catch (error) {
-    return response
-      .status(Constants.HttpStatusCodes.INTERNAL_SERVER_ERROR)
-      .json(Helpers.generateErrorResponse(error));
-  }
-}
-
-// ========================================================================================= //
 // [ LOGIN EXISTING USER ] ================================================================= //
 // ========================================================================================= //
 
@@ -85,6 +54,38 @@ export async function login(
 }
 
 // ========================================================================================= //
+// [ VERIFY REGISTRATION ] ================================================================= //
+// ========================================================================================= //
+
+export async function verifyRegistration(
+  request: Request<{}, {}, Validators.VerificationCodeValidator>,
+  response: Response
+) {
+  try {
+    const verifiedUser = await Services.generateVerifiedUser(
+      "Verifying Registration",
+      request.body.email
+    );
+    const safeUser = Services.generateSafeUser(verifiedUser);
+
+    const accessToken = Services.generateAccessToken(response, safeUser.id);
+
+    return response
+      .status(Constants.HttpStatusCodes.OK)
+      .json(
+        Helpers.generateDataResponse(
+          { safeUser, accessToken },
+          "Email verified!"
+        )
+      );
+  } catch (error) {
+    return response
+      .status(Constants.HttpStatusCodes.INTERNAL_SERVER_ERROR)
+      .json(Helpers.generateErrorResponse(error));
+  }
+}
+
+// ========================================================================================= //
 // [ VERIFY LOGIN ] ======================================================================== //
 // ========================================================================================= //
 
@@ -97,13 +98,17 @@ export async function verifyLogin(
   response: Response
 ) {
   try {
-    const { verifiedUser, accessToken } = await Services.verifyAuthWithToken(
+    const verifiedUser = await Services.generateVerifiedUser(
       "Verifying Login",
-      request.body.email,
+      request.body.email
+    );
+    const safeUser = Services.generateSafeUser(verifiedUser);
+
+    const accessToken = Services.generateAccessToken(
+      response,
+      safeUser.id,
       request.body.thirtyDays
     );
-
-    const safeUser = Services.generateSafeUser(verifiedUser);
 
     return response
       .status(Constants.HttpStatusCodes.OK)
@@ -126,7 +131,7 @@ export async function sendNewVerificationCode(
   response: Response
 ) {
   try {
-    const safeUser = await Services.updateAndEmailUserWithNewVerificationCode(
+    const safeUser = await Services.sendUserNewVerificationCode(
       response,
       request.body.email
     );
