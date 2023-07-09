@@ -3,17 +3,9 @@ import { Request, Response } from "express";
 import * as Services from "@/services";
 import * as Validators from "@/validators";
 
-// ========================================================================================= //
-// [ FETCH All USERS ] ===================================================================== //
-// ========================================================================================= //
-
 export async function getUsers(_: Request, response: Response) {
   return Services.getUsers(response);
 }
-
-// ========================================================================================= //
-// [ FETCH A USER ] ======================================================================== //
-// ========================================================================================= //
 
 export async function getUser(
   request: Request<{ userId: string }>,
@@ -21,10 +13,6 @@ export async function getUser(
 ) {
   return Services.getUser(response, Number(request.params.userId));
 }
-
-// ========================================================================================= //
-// [ UPDATE A USER ] ======================================================================= //
-// ========================================================================================= //
 
 export async function updateUser(
   request: Request<{ userId: string }, {}, Validators.UserUpdateValidator>,
@@ -41,10 +29,6 @@ export async function updateUser(
   );
 }
 
-// ========================================================================================= //
-// [ UPDATE A USER'S PASSWORD ] ============================================================ //
-// ========================================================================================= //
-
 export async function updateUserPassword(
   request: Request<{ userId: string }, {}, Validators.UpdatePasswordValidator>,
   response: Response
@@ -55,10 +39,6 @@ export async function updateUserPassword(
     request.body.newPassword
   );
 }
-
-// ========================================================================================= //
-// [ DELETE A USER ] ======================================================================= //
-// ========================================================================================= //
 
 export async function deleteUser(
   request: Request<{ userId: string }>,

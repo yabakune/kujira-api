@@ -139,9 +139,7 @@ export async function updateUserPassword(
 
 export async function deleteUser(response: Response, userId: number) {
   try {
-    const { id } = await prisma.user.delete({
-      where: { id: userId },
-    });
+    const { id } = await prisma.user.delete({ where: { id: userId } });
     return response
       .status(Constants.HttpStatusCodes.OK)
       .json(
