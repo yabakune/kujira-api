@@ -13,4 +13,6 @@ export enum Errors {
   ENTRY_DOES_NOT_EXIST = "Entry does not exist.",
 
   PURCHASE_DOES_NOT_EXIST = "Purchase does not exist.",
+
+  CREATE_ERROR = "Please make sure that you've filled in all required fields and try again.",
 }

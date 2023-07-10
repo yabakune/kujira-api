@@ -1,5 +1,5 @@
-import { Response } from "express";
 import { Currency, PrismaClient, Theme, User } from "@prisma/client";
+import { Response } from "express";
 
 import * as Constants from "@/constants";
 import * as Helpers from "@/helpers";
@@ -36,9 +36,12 @@ export async function getUsers(response: Response) {
     const users = await prisma.user.findMany({ orderBy: { id: "asc" } });
     const safeUsers = generateSafeUsers(users);
 
-    return response
-      .status(Constants.HttpStatusCodes.OK)
-      .json(Helpers.generateResponse({ response: safeUsers }));
+    return response.status(Constants.HttpStatusCodes.OK).json(
+      Helpers.generateResponse({
+        body: "Fetched accounts!",
+        response: safeUsers,
+      })
+    );
   } catch (error) {
     console.error(error);
     return response
@@ -58,12 +61,15 @@ export async function getUser(response: Response, userId: number) {
     });
     const safeUser = generateSafeUser(user);
 
-    return response
-      .status(Constants.HttpStatusCodes.OK)
-      .json(Helpers.generateResponse({ response: safeUser }));
+    return response.status(Constants.HttpStatusCodes.OK).json(
+      Helpers.generateResponse({
+        body: "Fetched account!",
+        response: safeUser,
+      })
+    );
   } catch (error) {
     console.error(error);
-    return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
+    return response.status(Constants.HttpStatusCodes.NOT_FOUND).json(
       Helpers.generateErrorResponse({
         body: Constants.Errors.ACCOUNT_DOES_NOT_EXIST,
       })
@@ -97,13 +103,13 @@ export async function updateUser(
 
     return response.status(Constants.HttpStatusCodes.OK).json(
       Helpers.generateResponse({
-        body: "Account updated!",
+        body: "Updated account!",
         response: safeUser,
       })
     );
   } catch (error) {
     console.error(error);
-    return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
+    return response.status(Constants.HttpStatusCodes.NOT_FOUND).json(
       Helpers.generateErrorResponse({
         body: Constants.Errors.ACCOUNT_DOES_NOT_EXIST,
       })
@@ -126,10 +132,10 @@ export async function updateUserPassword(
 
     return response
       .status(Constants.HttpStatusCodes.OK)
-      .json(Helpers.generateResponse({ body: "Password updated!" }));
+      .json(Helpers.generateResponse({ body: "Updated password!" }));
   } catch (error) {
     console.error(error);
-    return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
+    return response.status(Constants.HttpStatusCodes.NOT_FOUND).json(
       Helpers.generateErrorResponse({
         body: "Failed to update password. Please try again.",
       })
@@ -143,11 +149,11 @@ export async function deleteUser(response: Response, userId: number) {
     return response
       .status(Constants.HttpStatusCodes.OK)
       .json(
-        Helpers.generateResponse({ body: "Account deleted!", response: id })
+        Helpers.generateResponse({ body: "Deleted account!", response: id })
       );
   } catch (error) {
     console.error(error);
-    return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
+    return response.status(Constants.HttpStatusCodes.NOT_FOUND).json(
       Helpers.generateErrorResponse({
         body: Constants.Errors.ACCOUNT_DOES_NOT_EXIST,
       })

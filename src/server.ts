@@ -12,7 +12,7 @@ import { rateLimit } from "express-rate-limit";
 
 import * as Routes from "@/routes";
 import { generateResponse } from "./helpers";
-// import { validateAuthorizedUser } from "./middleware";
+import { validateAuthorizedUser } from "./middleware";
 
 dotenv.config();
 const app = express();
@@ -43,9 +43,17 @@ enum RouteBases {
   PURCHASES = "/api/v1/purchases",
   BUG_REPORTS = "/api/v1/bug-reports",
 }
-app.use(RouteBases.AUTH, Routes.authRouter);
-app.use(RouteBases.USERS, Routes.usersRouter);
-app.use(RouteBases.OVERVIEWS, Routes.overviewRouter);
+if (process.env.NODE_ENV === "production") {
+  app.use(RouteBases.AUTH, validateAuthorizedUser, Routes.authRouter);
+  app.use(RouteBases.USERS, validateAuthorizedUser, Routes.usersRouter);
+  app.use(RouteBases.OVERVIEWS, validateAuthorizedUser, Routes.overviewRouter);
+  app.use(RouteBases.LOGBOOKS, validateAuthorizedUser, Routes.logbooksRouter);
+} else {
+  app.use(RouteBases.AUTH, Routes.authRouter);
+  app.use(RouteBases.USERS, Routes.usersRouter);
+  app.use(RouteBases.OVERVIEWS, Routes.overviewRouter);
+  app.use(RouteBases.LOGBOOKS, Routes.logbooksRouter);
+}
 
 // ↓↓↓ Fallback in case I forgot to catch an error somewhere. ↓↓↓ //
 const errorFallbackMiddleware: ErrorRequestHandler = (
