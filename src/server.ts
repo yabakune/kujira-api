@@ -48,11 +48,13 @@ if (process.env.NODE_ENV === "production") {
   app.use(RouteBases.USERS, validateAuthorizedUser, Routes.usersRouter);
   app.use(RouteBases.OVERVIEWS, validateAuthorizedUser, Routes.overviewRouter);
   app.use(RouteBases.LOGBOOKS, validateAuthorizedUser, Routes.logbooksRouter);
+  app.use(RouteBases.ENTRIES, validateAuthorizedUser, Routes.entriesRouter);
 } else {
   app.use(RouteBases.AUTH, Routes.authRouter);
   app.use(RouteBases.USERS, Routes.usersRouter);
   app.use(RouteBases.OVERVIEWS, Routes.overviewRouter);
   app.use(RouteBases.LOGBOOKS, Routes.logbooksRouter);
+  app.use(RouteBases.ENTRIES, Routes.entriesRouter);
 }
 
 // ↓↓↓ Fallback in case I forgot to catch an error somewhere. ↓↓↓ //

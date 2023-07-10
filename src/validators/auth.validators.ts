@@ -1,9 +1,5 @@
 import { Prisma } from "@prisma/client";
 
-// ========================================================================================= //
-// [ REGISTRATION VALIDATORS ] ============================================================= //
-// ========================================================================================= //
-
 const registrationValidator = Prisma.validator<Prisma.UserArgs>()({
   select: {
     email: true,
@@ -17,10 +13,6 @@ export type RegistrationValidator = Prisma.UserGetPayload<
 >;
 export type RequiredRegistrationData = (keyof RegistrationValidator)[];
 
-// ========================================================================================= //
-// [ LOGIN VALIDATORS ] ==================================================================== //
-// ========================================================================================= //
-
 const loginValidator = Prisma.validator<Prisma.UserArgs>()({
   select: {
     email: true,
@@ -29,10 +21,6 @@ const loginValidator = Prisma.validator<Prisma.UserArgs>()({
 });
 export type LoginValidator = Prisma.UserGetPayload<typeof loginValidator>;
 export type RequiredLoginData = (keyof LoginValidator)[];
-
-// ========================================================================================= //
-// [ VERIFICATION CODE VALIDATORS ] ======================================================== //
-// ========================================================================================= //
 
 const verificationCodeValidator = Prisma.validator<Prisma.UserArgs>()({
   select: { email: true, verificationCode: true },

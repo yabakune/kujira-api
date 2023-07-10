@@ -37,12 +37,14 @@ export async function getOverview(response: Response, overviewId: number) {
       where: { id: overviewId },
     });
 
-    return response.status(Constants.HttpStatusCodes.OK).json(
-      Helpers.generateResponse({
-        body: "Fetched overview!",
-        response: overview,
-      })
-    );
+    return response
+      .status(Constants.HttpStatusCodes.OK)
+      .json(
+        Helpers.generateResponse({
+          body: "Fetched overview!",
+          response: overview,
+        })
+      );
   } catch (error) {
     console.error(error);
     return response.status(Constants.HttpStatusCodes.NOT_FOUND).json({
