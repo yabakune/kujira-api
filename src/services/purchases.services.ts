@@ -124,14 +124,12 @@ export async function deletePurchase(response: Response, purchaseId: number) {
   try {
     await prisma.purchase.delete({ where: { id: purchaseId } });
 
-    return response
-      .status(Constants.HttpStatusCodes.OK)
-      .json(
-        Helpers.generateResponse({
-          body: "Deleted purchase!",
-          response: purchaseId,
-        })
-      );
+    return response.status(Constants.HttpStatusCodes.OK).json(
+      Helpers.generateResponse({
+        body: "Deleted purchase!",
+        response: purchaseId,
+      })
+    );
   } catch (error) {
     console.error(error);
     return response.status(Constants.HttpStatusCodes.NOT_FOUND).json(
@@ -147,6 +145,14 @@ export async function bulkDeletePurchases(
   purchaseIds: number[]
 ) {
   try {
+    await prisma.purchase.deleteMany({ where: { id: { in: purchaseIds } } });
+
+    return response.status(Constants.HttpStatusCodes.OK).json(
+      Helpers.generateResponse({
+        body: "Deleted purchases!",
+        response: purchaseIds,
+      })
+    );
   } catch (error) {
     console.error(error);
     return response
