@@ -38,8 +38,6 @@ purchasesRouter.patch(
   Controllers.updatePurchase
 );
 
-purchasesRouter.delete("/:purchaseId", Controllers.deletePurchase);
-
 const requiredBulkDeletePurchasesData = ["purchaseIds"];
 purchasesRouter.delete(
   "/bulk-delete-purchases",
@@ -51,9 +49,11 @@ purchasesRouter.delete(
 
 const requiredDeleteAllEntryPurchasesData = ["entryId"];
 purchasesRouter.delete(
-  "/deleteAllEntryPurchases",
+  "/delete-all-entry-purchases",
   Middleware.verifyClientPayload({
     requiredData: requiredDeleteAllEntryPurchasesData,
   }),
   Controllers.deleteAllEntryPurchases
 );
+
+purchasesRouter.delete("/:purchaseId", Controllers.deletePurchase);

@@ -145,21 +145,27 @@ export async function bulkDeletePurchases(
   purchaseIds: number[]
 ) {
   try {
-    await prisma.purchase.deleteMany({ where: { id: { in: purchaseIds } } });
+    if (purchaseIds.length < 2) {
+      throw new Error();
+    } else {
+      const { count } = await prisma.purchase.deleteMany({
+        where: { id: { in: purchaseIds } },
+      });
 
-    return response.status(Constants.HttpStatusCodes.OK).json(
-      Helpers.generateResponse({
-        body: "Deleted purchases!",
-        response: purchaseIds,
-      })
-    );
+      return response.status(Constants.HttpStatusCodes.OK).json(
+        Helpers.generateResponse({
+          body: `Deleted ${count} purchases!`,
+          response: purchaseIds,
+        })
+      );
+    }
   } catch (error) {
     console.error(error);
     return response
       .status(Constants.HttpStatusCodes.INTERNAL_SERVER_ERROR)
       .json(
         Helpers.generateErrorResponse({
-          body: "Failed to delete purchases. Please refresh the page and try again.",
+          body: "Failed to delete purchases. Either select more than one purchase or refresh the page and try again.",
         })
       );
   }
