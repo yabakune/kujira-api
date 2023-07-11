@@ -57,7 +57,7 @@ export async function createLogbook(
   ownerId: number
 ) {
   try {
-    const data: Validators.LogbookCreateValidator = {
+    const data: Validators.RequiredLogbookCreateValidator = {
       name,
       ownerId,
     };

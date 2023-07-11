@@ -57,7 +57,8 @@ export async function createEntry(
   logbookId?: number | null
 ) {
   try {
-    const data: Validators.EntryCreateValidator = {
+    const data: Validators.RequiredEntryCreateValidator &
+      Validators.OptionalEntryCreateValidator = {
       name,
       overviewId,
       logbookId,

@@ -8,11 +8,54 @@ import * as Helpers from "@/helpers";
 // [ MAKING SURE THE CLIENT SENT THE CORRECT DATA TO THE API ] ============================= //
 // ========================================================================================= //
 
-function shortCircuitOnUnexpectedPayload(
+function generateMissingRequiredData(
+  suppliedClientPayload: string[],
+  requiredData?: string[]
+) {
+  if (requiredData) {
+    const missingClientData = requiredData.filter(
+      (data: string) => !suppliedClientPayload.includes(data)
+    );
+    return missingClientData;
+  } else {
+    return [];
+  }
+}
+
+function throwOnMissingRequiredData(
   response: Response,
   suppliedClientPayload: string[],
-  expectedClientPayload: string[]
+  requiredData?: string[]
 ) {
+  try {
+    const missingRequiredData = generateMissingRequiredData(
+      suppliedClientPayload,
+      requiredData
+    );
+
+    if (missingRequiredData.length > 0) {
+      throw new Error(missingRequiredData.join(", "));
+    } else {
+      return;
+    }
+  } catch (error: any) {
+    console.error(error);
+    return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
+      Helpers.generateErrorResponse({
+        body: `Missing Data: ${error.message}.`,
+      })
+    );
+  }
+}
+
+function throwOnUnexpectedPayload(
+  response: Response,
+  suppliedClientPayload: string[],
+  requiredData: string[],
+  optionalData: string[]
+) {
+  const expectedClientPayload = requiredData.concat(optionalData);
+
   try {
     for (const suppliedPayload of suppliedClientPayload) {
       if (!expectedClientPayload.includes(suppliedPayload)) {
@@ -30,66 +73,6 @@ function shortCircuitOnUnexpectedPayload(
   }
 }
 
-function validateUnexpectedPayload(
-  response: Response,
-  suppliedClientPayload: string[],
-  requiredData?: string[],
-  optionalData?: string[]
-) {
-  if (requiredData && requiredData.length > 0) {
-    shortCircuitOnUnexpectedPayload(
-      response,
-      suppliedClientPayload,
-      requiredData
-    );
-  } else if (optionalData && optionalData.length > 0) {
-    shortCircuitOnUnexpectedPayload(
-      response,
-      suppliedClientPayload,
-      optionalData
-    );
-  }
-}
-
-function generateMissingRequiredData(
-  suppliedClientPayload: string[],
-  requiredData?: string[]
-) {
-  if (requiredData) {
-    const missingClientData = requiredData.filter(
-      (data: string) => !suppliedClientPayload.includes(data)
-    );
-    return missingClientData;
-  } else {
-    return [];
-  }
-}
-
-function validateMissingRequiredData(
-  response: Response,
-  suppliedClientPayload: string[],
-  requiredData?: string[]
-) {
-  try {
-    const missingRequiredData = generateMissingRequiredData(
-      suppliedClientPayload,
-      requiredData
-    );
-    if (missingRequiredData.length > 0) {
-      throw new Error(missingRequiredData.join(", "));
-    } else {
-      return;
-    }
-  } catch (error: any) {
-    console.error(error);
-    return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
-      Helpers.generateErrorResponse({
-        body: `Missing Data: ${error.message}.`,
-      })
-    );
-  }
-}
-
 type ExpectedClientPayload = {
   requiredData?: string[];
   optionalData?: string[];
@@ -102,14 +85,14 @@ export function verifyClientPayload(
     const suppliedClientPayload = Object.keys(request.body); // Data sent from the client.
     const { requiredData, optionalData } = expectedClientPayload;
 
-    validateUnexpectedPayload(
+    throwOnUnexpectedPayload(
       response,
       suppliedClientPayload,
-      requiredData,
-      optionalData
+      requiredData || [],
+      optionalData || []
     );
 
-    validateMissingRequiredData(response, suppliedClientPayload, requiredData);
+    throwOnMissingRequiredData(response, suppliedClientPayload, requiredData);
 
     return next();
   };

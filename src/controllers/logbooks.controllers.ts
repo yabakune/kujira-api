@@ -15,7 +15,7 @@ export async function getLogbook(
 }
 
 export async function createLogbook(
-  request: Request<{}, {}, Validators.LogbookCreateValidator>,
+  request: Request<{}, {}, Validators.RequiredLogbookCreateValidator>,
   response: Response
 ) {
   return Services.createLogbook(

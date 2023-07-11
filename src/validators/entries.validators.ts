@@ -1,13 +1,20 @@
 import { Prisma } from "@prisma/client";
 
-const entryCreateValidator = Prisma.validator<Prisma.EntryArgs>()({
+const requiredEntryCreateValidator = Prisma.validator<Prisma.EntryArgs>()({
   select: { name: true },
 });
-export type EntryCreateValidator = Prisma.EntryGetPayload<
-  typeof entryCreateValidator
-> & { overviewId?: number | null; logbookId?: number | null };
-export type RequiredEntryCreateData = (keyof EntryCreateValidator)[];
-export type OptionalEntryCreateData = ["overviewId", "logbookId"];
+export type RequiredEntryCreateValidator = Prisma.EntryGetPayload<
+  typeof requiredEntryCreateValidator
+>;
+export type RequiredEntryCreateData = (keyof RequiredEntryCreateValidator)[];
+
+const optionalEntryCreateValidator = Prisma.validator<Prisma.EntryArgs>()({
+  select: { overviewId: true, logbookId: true },
+});
+export type OptionalEntryCreateValidator = Partial<
+  Prisma.EntryGetPayload<typeof optionalEntryCreateValidator>
+>;
+export type OptionalEntryCreateData = (keyof OptionalEntryCreateValidator)[];
 
 const entryUpdateValidator = Prisma.validator<Prisma.EntryArgs>()({
   select: {

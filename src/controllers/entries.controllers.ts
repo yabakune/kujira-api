@@ -15,7 +15,12 @@ export async function getEntry(
 }
 
 export async function createEntry(
-  request: Request<{}, {}, Validators.EntryCreateValidator>,
+  request: Request<
+    {},
+    {},
+    Validators.RequiredEntryCreateValidator &
+      Validators.OptionalEntryCreateValidator
+  >,
   response: Response
 ) {
   return Services.createEntry(
