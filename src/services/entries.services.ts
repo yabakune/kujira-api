@@ -1,5 +1,5 @@
-import { Response } from "express";
 import { PrismaClient } from "@prisma/client";
+import { Response } from "express";
 
 import * as Constants from "@/constants";
 import * as Helpers from "@/helpers";
