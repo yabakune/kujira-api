@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { Category, PrismaClient } from "@prisma/client";
 import { Response } from "express";
 
 import * as Constants from "@/constants";
@@ -48,6 +48,39 @@ export async function getPurchase(response: Response, purchaseId: number) {
     return response.status(Constants.HttpStatusCodes.NOT_FOUND).json(
       Helpers.generateErrorResponse({
         body: Constants.Errors.PURCHASE_DOES_NOT_EXIST,
+      })
+    );
+  }
+}
+
+export async function createPurchase(
+  response: Response,
+  category: Category,
+  entryId: number,
+  description?: string,
+  cost?: number | null
+) {
+  try {
+    const data: Validators.RequiredPurchaseCreateValidator &
+      Validators.OptionalPurchaseCreateValidator = {
+      category,
+      entryId,
+      description,
+      cost,
+    };
+    const purchase = await prisma.purchase.create({ data });
+
+    return response.status(Constants.HttpStatusCodes.CREATED).json(
+      Helpers.generateResponse({
+        body: "Created purchase!",
+        response: purchase,
+      })
+    );
+  } catch (error) {
+    console.error(error);
+    return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
+      Helpers.generateErrorResponse({
+        body: "Failed to create purchase." + Constants.Errors.CREATE_ERROR,
       })
     );
   }

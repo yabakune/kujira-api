@@ -19,8 +19,8 @@ const optionalPurchaseCreateValidator = Prisma.validator<Prisma.PurchaseArgs>()(
     select: { description: true, cost: true },
   }
 );
-export type OptionalPurchaseCreateValidator = Prisma.PurchaseGetPayload<
-  typeof optionalPurchaseCreateValidator
+export type OptionalPurchaseCreateValidator = Partial<
+  Prisma.PurchaseGetPayload<typeof optionalPurchaseCreateValidator>
 >;
 export type OptionalPurchaseCreateData =
   (keyof OptionalPurchaseCreateValidator)[];
