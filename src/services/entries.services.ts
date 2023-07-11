@@ -109,7 +109,7 @@ export async function updateEntry(
   } catch (error) {
     console.error(error);
     return response.status(Constants.HttpStatusCodes.NOT_FOUND).json({
-      body: Constants.Errors.ENTRY_DOES_NOT_EXIST,
+      body: Constants.generateUpdateError("entry"),
     });
   }
 }

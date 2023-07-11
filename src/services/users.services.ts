@@ -111,7 +111,7 @@ export async function updateUser(
     console.error(error);
     return response.status(Constants.HttpStatusCodes.NOT_FOUND).json(
       Helpers.generateErrorResponse({
-        body: Constants.Errors.ACCOUNT_DOES_NOT_EXIST,
+        body: Constants.generateUpdateError("user"),
       })
     );
   }

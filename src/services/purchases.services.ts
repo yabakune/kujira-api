@@ -112,9 +112,9 @@ export async function updatePurchase(
     );
   } catch (error) {
     console.error(error);
-    return response.status(Constants.HttpStatusCodes.NOT_FOUND).json(
+    return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
       Helpers.generateErrorResponse({
-        body: Constants.Errors.PURCHASE_DOES_NOT_EXIST,
+        body: Constants.generateUpdateError("purchase"),
       })
     );
   }

@@ -107,7 +107,7 @@ export async function updateOverview(
     console.error(error);
     return response.status(Constants.HttpStatusCodes.NOT_FOUND).json(
       Helpers.generateErrorResponse({
-        body: Constants.Errors.OVERVIEW_DOES_NOT_EXIST,
+        body: Constants.generateUpdateError("overview"),
       })
     );
   }
@@ -117,14 +117,12 @@ export async function deleteOverview(response: Response, overviewId: number) {
   try {
     await prisma.overview.delete({ where: { id: overviewId } });
 
-    return response
-      .status(Constants.HttpStatusCodes.OK)
-      .json(
-        Helpers.generateResponse({
-          body: "Deleted overview!",
-          response: overviewId,
-        })
-      );
+    return response.status(Constants.HttpStatusCodes.OK).json(
+      Helpers.generateResponse({
+        body: "Deleted overview!",
+        response: overviewId,
+      })
+    );
   } catch (error) {
     console.error(error);
     return response.status(Constants.HttpStatusCodes.NOT_FOUND).json(

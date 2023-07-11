@@ -1,3 +1,7 @@
+export function generateUpdateError(model: string): string {
+  return `Failed to update ${model}. The ${model} either doesn't exist or you didn't provide the correct details. Please refresh the page and try again.`;
+}
+
 export enum Errors {
   AUTH_SECRET_KEY_DOES_NOT_EXIST = "AUTH_SECRET_KEY environment variable does not exist.",
   VERIFICATION_CODE_SECRET_KEY_DOES_NOT_EXIST = "VERIFICATION_CODE_SECRET_KEY environment variable does not exist.",

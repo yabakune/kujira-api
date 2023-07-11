@@ -103,7 +103,7 @@ export async function updateLogbook(
     console.error(error);
     return response.status(Constants.HttpStatusCodes.NOT_FOUND).json(
       Helpers.generateErrorResponse({
-        body: Constants.Errors.LOGBOOK_DOES_NOT_EXIST,
+        body: Constants.generateUpdateError("logbook"),
       })
     );
   }
