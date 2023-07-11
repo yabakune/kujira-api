@@ -116,11 +116,13 @@ export async function updateEntry(
 
 export async function deleteEntry(response: Response, entryId: number) {
   try {
-    const { id } = await prisma.entry.delete({ where: { id: entryId } });
+    await prisma.entry.delete({ where: { id: entryId } });
 
     return response
       .status(Constants.HttpStatusCodes.OK)
-      .json(Helpers.generateResponse({ body: "Deleted entry!", response: id }));
+      .json(
+        Helpers.generateResponse({ body: "Deleted entry!", response: entryId })
+      );
   } catch (error) {
     console.error(error);
     return response.status(Constants.HttpStatusCodes.NOT_FOUND).json(

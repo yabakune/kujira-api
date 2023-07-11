@@ -111,12 +111,15 @@ export async function updateLogbook(
 
 export async function deleteLogbook(response: Response, logbookId: number) {
   try {
-    const { id } = await prisma.logbook.delete({ where: { id: logbookId } });
+    await prisma.logbook.delete({ where: { id: logbookId } });
 
     return response
       .status(Constants.HttpStatusCodes.OK)
       .json(
-        Helpers.generateResponse({ body: "Deleted logbook!", response: id })
+        Helpers.generateResponse({
+          body: "Deleted logbook!",
+          response: logbookId,
+        })
       );
   } catch (error) {
     console.error(error);

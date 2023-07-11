@@ -37,14 +37,12 @@ export async function getOverview(response: Response, overviewId: number) {
       where: { id: overviewId },
     });
 
-    return response
-      .status(Constants.HttpStatusCodes.OK)
-      .json(
-        Helpers.generateResponse({
-          body: "Fetched overview!",
-          response: overview,
-        })
-      );
+    return response.status(Constants.HttpStatusCodes.OK).json(
+      Helpers.generateResponse({
+        body: "Fetched overview!",
+        response: overview,
+      })
+    );
   } catch (error) {
     console.error(error);
     return response.status(Constants.HttpStatusCodes.NOT_FOUND).json({
@@ -117,12 +115,15 @@ export async function updateOverview(
 
 export async function deleteOverview(response: Response, overviewId: number) {
   try {
-    const { id } = await prisma.overview.delete({ where: { id: overviewId } });
+    await prisma.overview.delete({ where: { id: overviewId } });
 
     return response
       .status(Constants.HttpStatusCodes.OK)
       .json(
-        Helpers.generateResponse({ body: "Deleted overview!", response: id })
+        Helpers.generateResponse({
+          body: "Deleted overview!",
+          response: overviewId,
+        })
       );
   } catch (error) {
     console.error(error);

@@ -104,12 +104,32 @@ export async function updatePurchase(
       data,
     });
 
+    return response.status(Constants.HttpStatusCodes.OK).json(
+      Helpers.generateResponse({
+        body: "Updated purchase!",
+        response: purchase,
+      })
+    );
+  } catch (error) {
+    console.error(error);
+    return response.status(Constants.HttpStatusCodes.NOT_FOUND).json(
+      Helpers.generateErrorResponse({
+        body: Constants.Errors.PURCHASE_DOES_NOT_EXIST,
+      })
+    );
+  }
+}
+
+export async function deletePurchase(response: Response, purchaseId: number) {
+  try {
+    await prisma.purchase.delete({ where: { id: purchaseId } });
+
     return response
       .status(Constants.HttpStatusCodes.OK)
       .json(
         Helpers.generateResponse({
-          body: "Updated purchase!",
-          response: purchase,
+          body: "Deleted purchase!",
+          response: purchaseId,
         })
       );
   } catch (error) {
@@ -119,5 +139,22 @@ export async function updatePurchase(
         body: Constants.Errors.PURCHASE_DOES_NOT_EXIST,
       })
     );
+  }
+}
+
+export async function bulkDeletePurchases(
+  response: Response,
+  purchaseIds: number[]
+) {
+  try {
+  } catch (error) {
+    console.error(error);
+    return response
+      .status(Constants.HttpStatusCodes.INTERNAL_SERVER_ERROR)
+      .json(
+        Helpers.generateErrorResponse({
+          body: "Failed to delete purchases. Please refresh the page and try again.",
+        })
+      );
   }
 }
