@@ -164,3 +164,34 @@ export async function bulkDeletePurchases(
       );
   }
 }
+
+export async function deleteAllEntryPurchases(
+  response: Response,
+  entryId: number
+) {
+  try {
+    const purchases = await prisma.purchase.findMany({
+      where: { entryId },
+      select: { id: true },
+    });
+    const deletedPurchaseIds = purchases.map((purchase: { id: number }) => {
+      return purchase.id;
+    });
+
+    const { count } = await prisma.purchase.deleteMany({
+      where: { entryId },
+    });
+
+    return response.status(Constants.HttpStatusCodes.OK).json({
+      body: `Deleted ${count} purchases!`,
+      response: deletedPurchaseIds,
+    });
+  } catch (error) {
+    console.error(error);
+    return response.status(Constants.HttpStatusCodes.NOT_FOUND).json(
+      Helpers.generateResponse({
+        body: "Failed to delete all purchases. Please refresh the page and try again.",
+      })
+    );
+  }
+}
