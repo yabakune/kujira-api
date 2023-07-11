@@ -38,7 +38,7 @@ purchasesRouter.patch(
   Controllers.updatePurchase
 );
 
-purchasesRouter.delete("/:purchaseId");
+purchasesRouter.delete("/:purchaseId", Controllers.deletePurchase);
 
 const requiredBulkDeletePurchasesData = ["purchaseIds"];
 purchasesRouter.delete(
