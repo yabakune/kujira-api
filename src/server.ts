@@ -46,15 +46,17 @@ enum RouteBases {
 if (process.env.NODE_ENV === "production") {
   app.use(RouteBases.AUTH, validateAuthorizedUser, Routes.authRouter);
   app.use(RouteBases.USERS, validateAuthorizedUser, Routes.usersRouter);
-  app.use(RouteBases.OVERVIEWS, validateAuthorizedUser, Routes.overviewRouter);
+  app.use(RouteBases.OVERVIEWS, validateAuthorizedUser, Routes.overviewsRouter);
   app.use(RouteBases.LOGBOOKS, validateAuthorizedUser, Routes.logbooksRouter);
   app.use(RouteBases.ENTRIES, validateAuthorizedUser, Routes.entriesRouter);
+  app.use(RouteBases.PURCHASES, validateAuthorizedUser, Routes.purchasesRouter);
 } else {
   app.use(RouteBases.AUTH, Routes.authRouter);
   app.use(RouteBases.USERS, Routes.usersRouter);
-  app.use(RouteBases.OVERVIEWS, Routes.overviewRouter);
+  app.use(RouteBases.OVERVIEWS, Routes.overviewsRouter);
   app.use(RouteBases.LOGBOOKS, Routes.logbooksRouter);
   app.use(RouteBases.ENTRIES, Routes.entriesRouter);
+  app.use(RouteBases.PURCHASES, Routes.purchasesRouter);
 }
 
 // ↓↓↓ Fallback in case I forgot to catch an error somewhere. ↓↓↓ //

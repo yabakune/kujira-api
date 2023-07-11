@@ -4,11 +4,11 @@ import * as Controllers from "@/controllers";
 import * as Middleware from "@/middleware";
 import * as Validators from "@/validators";
 
-export const overviewRouter = express.Router();
+export const overviewsRouter = express.Router();
 
-overviewRouter.get("/", Controllers.getOverviews);
+overviewsRouter.get("/", Controllers.getOverviews);
 
-overviewRouter.get("/:overviewId", Controllers.getOverview);
+overviewsRouter.get("/:overviewId", Controllers.getOverview);
 
 const requiredOverviewCreateData: Validators.RequiredOverviewCreateData = [
   "income",
@@ -17,7 +17,7 @@ const requiredOverviewCreateData: Validators.RequiredOverviewCreateData = [
 const optionalOverviewCreateData: Validators.RequiredOverviewCreateData = [
   "savings",
 ];
-overviewRouter.post(
+overviewsRouter.post(
   "/",
   Middleware.verifyClientPayload({
     requiredData: requiredOverviewCreateData,
@@ -30,10 +30,10 @@ const optionalOverviewUpdateData: Validators.OptionalOverviewUpdateData = [
   "income",
   "savings",
 ];
-overviewRouter.patch(
+overviewsRouter.patch(
   "/:overviewId",
   Middleware.verifyClientPayload({ optionalData: optionalOverviewUpdateData }),
   Controllers.updateOverview
 );
 
-overviewRouter.delete("/:overviewId", Controllers.deleteOverview);
+overviewsRouter.delete("/:overviewId", Controllers.deleteOverview);
