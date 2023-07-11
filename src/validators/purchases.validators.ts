@@ -34,8 +34,8 @@ const optionalPurchaseUpdateValidator = Prisma.validator<Prisma.PurchaseArgs>()(
     },
   }
 );
-export type OptionalPurchaseUpdateValidator = Prisma.PurchaseGetPayload<
-  typeof optionalPurchaseUpdateValidator
+export type OptionalPurchaseUpdateValidator = Partial<
+  Prisma.PurchaseGetPayload<typeof optionalPurchaseUpdateValidator>
 >;
 export type OptionalPurchaseUpdateData =
   (keyof OptionalPurchaseUpdateValidator)[];

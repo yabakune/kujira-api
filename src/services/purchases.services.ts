@@ -85,3 +85,39 @@ export async function createPurchase(
     );
   }
 }
+
+export async function updatePurchase(
+  response: Response,
+  purchaseId: number,
+  category?: Category,
+  description?: string,
+  cost?: number | null
+) {
+  try {
+    const data: Validators.OptionalPurchaseUpdateValidator = {
+      category,
+      description,
+      cost,
+    };
+    const purchase = await prisma.purchase.update({
+      where: { id: purchaseId },
+      data,
+    });
+
+    return response
+      .status(Constants.HttpStatusCodes.OK)
+      .json(
+        Helpers.generateResponse({
+          body: "Updated purchase!",
+          response: purchase,
+        })
+      );
+  } catch (error) {
+    console.error(error);
+    return response.status(Constants.HttpStatusCodes.NOT_FOUND).json(
+      Helpers.generateErrorResponse({
+        body: Constants.Errors.PURCHASE_DOES_NOT_EXIST,
+      })
+    );
+  }
+}
