@@ -20,17 +20,6 @@ function generateSafeUsers(users: User[]) {
   return excludeFieldFromUsersObject(users, ["password", "verificationCode"]);
 }
 
-function excludeFieldFromUserObject<User, Field extends keyof User>(
-  user: User,
-  fields: Field[]
-): Omit<User, Field> {
-  for (let field of fields) delete user[field];
-  return user;
-}
-export function generateSafeUser(user: User) {
-  return excludeFieldFromUserObject(user, ["password", "verificationCode"]);
-}
-
 export async function getUsers(response: Response) {
   try {
     const users = await prisma.user.findMany({ orderBy: { id: "asc" } });
@@ -59,7 +48,7 @@ export async function getUser(response: Response, userId: number) {
     const user = await prisma.user.findUniqueOrThrow({
       where: { id: userId },
     });
-    const safeUser = generateSafeUser(user);
+    const safeUser = Helpers.generateSafeUser(user);
 
     return response.status(Constants.HttpStatusCodes.OK).json(
       Helpers.generateResponse({
@@ -99,7 +88,7 @@ export async function updateUser(
       where: { id: userId },
       data,
     });
-    const safeUser = generateSafeUser(updatedUser);
+    const safeUser = Helpers.generateSafeUser(updatedUser);
 
     return response.status(Constants.HttpStatusCodes.OK).json(
       Helpers.generateResponse({

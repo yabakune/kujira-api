@@ -179,7 +179,7 @@ export async function sendUserNewVerificationCode(
       data: { verificationCode: verificationCode },
     });
 
-    const safeUser = Services.generateSafeUser(userWithNewVerificationCode);
+    const safeUser = Helpers.generateSafeUser(userWithNewVerificationCode);
 
     await Helpers.emailUser(email, "Kujira: New Verification Code", [
       "This email is in response to your request for a new verification code.",

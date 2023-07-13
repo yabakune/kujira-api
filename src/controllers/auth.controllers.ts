@@ -74,7 +74,7 @@ export async function verifyRegistration(
       "Verifying Registration",
       request.body.email
     );
-    const safeUser = Services.generateSafeUser(verifiedUser);
+    const safeUser = Helpers.generateSafeUser(verifiedUser);
 
     const accessToken = Services.generateAccessToken(
       response,
@@ -117,7 +117,7 @@ export async function verifyLogin(
       "Verifying Login",
       request.body.email
     );
-    const safeUser = Services.generateSafeUser(verifiedUser);
+    const safeUser = Helpers.generateSafeUser(verifiedUser);
 
     const accessToken = Services.generateAccessToken(
       response,
