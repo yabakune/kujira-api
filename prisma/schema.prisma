@@ -29,6 +29,7 @@ model User {
   currency         Currency    @default(USD)
   theme            Theme       @default(dark)
   mobileNumber     String?
+  accessToken      String?
   verificationCode String?
   emailVerified    Boolean     @default(false)
   onboarded        Boolean     @default(false)
