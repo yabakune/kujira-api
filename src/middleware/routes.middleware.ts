@@ -1,8 +1,11 @@
-import { NextFunction, Request, Response } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
+import { PrismaClient } from "@prisma/client";
+import { NextFunction, Request, Response } from "express";
 
 import * as Constants from "@/constants";
 import * as Helpers from "@/helpers";
+
+const prisma = new PrismaClient();
 
 // ========================================================================================= //
 // [ MAKING SURE THE CLIENT SENT THE CORRECT DATA TO THE API ] ============================= //
@@ -102,18 +105,27 @@ export function verifyClientPayload(
 // [ MIDDLEWARE THAT GATES ACCESS TO ROUTES THAT REQUIRE AUTHORIZED ACCESS ] =============== //
 // ========================================================================================= //
 
+type RequestWithUserId = Request<{}, {}, { userId: number }>;
 type RequestWithAccessToken = Request & { accessToken: string | JwtPayload };
 
-function validateAccessTokenExists(
-  request: Request,
+async function throwOnExpiredAccessToken(
+  request: RequestWithUserId,
   response: Response,
   next: NextFunction,
-  authSecretKey: string
+  authSecretKey: string,
+  accessToken: string
 ) {
   try {
-    const accessToken = request.header("authorization");
+    const accessTokenExpired = Helpers.checkJWTExpired(
+      accessToken,
+      authSecretKey
+    );
 
-    if (!accessToken) {
+    if (accessTokenExpired) {
+      await prisma.user.update({
+        where: { id: request.body.userId },
+        data: { accessToken: null },
+      });
       throw new Error();
     } else {
       const decodedAccessToken = jwt.verify(accessToken, authSecretKey);
@@ -122,7 +134,10 @@ function validateAccessTokenExists(
       return next();
     }
   } catch (error) {
-    console.error(error);
+    console.error(error, "Access token expired");
+    console.error(
+      `User with ID ${request.body.userId} has an expired access token. They must log in again.`
+    );
     return response.status(Constants.HttpStatusCodes.FORBIDDEN).json(
       Helpers.generateErrorResponse({
         body: "Unauthorized access. Please register or log in.",
@@ -131,8 +146,88 @@ function validateAccessTokenExists(
   }
 }
 
+async function throwOnMissingAccessToken(
+  request: RequestWithUserId,
+  response: Response,
+  next: NextFunction,
+  authSecretKey: string
+) {
+  try {
+    // const accessToken = request.header("authorization");
+    const { accessToken } = await prisma.user.findUniqueOrThrow({
+      where: { id: request.body.userId },
+    });
+
+    if (!accessToken) {
+      throw new Error();
+    } else {
+      return throwOnExpiredAccessToken(
+        request,
+        response,
+        next,
+        authSecretKey,
+        accessToken
+      );
+    }
+  } catch (error) {
+    console.error(
+      error,
+      `User with ID ${request.body.userId} does not have an access token.`
+    );
+    return response.status(Constants.HttpStatusCodes.FORBIDDEN).json(
+      Helpers.generateErrorResponse({
+        body: "Important account information no longer exists.",
+      })
+    );
+  }
+}
+
+async function throwOnMissingAccount(
+  request: RequestWithUserId,
+  response: Response,
+  next: NextFunction,
+  authSecretKey: string
+) {
+  try {
+    await prisma.user.findUniqueOrThrow({ where: { id: request.body.userId } });
+    return throwOnMissingAccessToken(request, response, next, authSecretKey);
+  } catch (error) {
+    console.error(error);
+    return response.status(Constants.HttpStatusCodes.NOT_FOUND).json(
+      Helpers.generateErrorResponse({
+        body: Constants.Errors.ACCOUNT_DOES_NOT_EXIST,
+      })
+    );
+  }
+}
+
+function throwOnMissingUserId(
+  request: RequestWithUserId,
+  response: Response,
+  next: NextFunction,
+  authSecretKey: string
+) {
+  try {
+    if (!request.body.userId) {
+      throw new Error();
+    } else {
+      return throwOnMissingAccount(request, response, next, authSecretKey);
+    }
+  } catch (error) {
+    console.error(
+      error,
+      "You must provide the current user's ID when trying to access a gated route."
+    );
+    return response.status(Constants.HttpStatusCodes.FORBIDDEN).json(
+      Helpers.generateErrorResponse({
+        body: "Missing important account information.",
+      })
+    );
+  }
+}
+
 export async function validateAuthorizedUser(
-  request: Request,
+  request: RequestWithUserId,
   response: Response,
   next: NextFunction
 ) {
@@ -142,7 +237,7 @@ export async function validateAuthorizedUser(
     if (!authSecretKey) {
       throw new Error();
     } else {
-      return validateAccessTokenExists(request, response, next, authSecretKey);
+      return throwOnMissingUserId(request, response, next, authSecretKey);
     }
   } catch (error) {
     console.error(Constants.Errors.AUTH_SECRET_KEY_DOES_NOT_EXIST);

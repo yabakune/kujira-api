@@ -70,23 +70,12 @@ export async function verifyRegistration(
   response: Response
 ) {
   try {
-    const verifiedUser = await Services.generateVerifiedUser(
-      "Verifying Registration",
-      request.body.email
-    );
-    const safeUser = Helpers.generateSafeUser(verifiedUser);
-
-    const accessToken = Services.generateAccessToken(
+    return Services.verifyUserAuth(
       response,
-      safeUser.id,
+      "Verifying Registration",
+      "Email verified!",
+      request.body.email,
       true
-    );
-
-    return response.status(Constants.HttpStatusCodes.OK).json(
-      Helpers.generateResponse({
-        body: "Email verified!",
-        response: { safeUser, accessToken },
-      })
     );
   } catch (error) {
     console.error(error);
@@ -113,23 +102,12 @@ export async function verifyLogin(
   response: Response
 ) {
   try {
-    const verifiedUser = await Services.generateVerifiedUser(
-      "Verifying Login",
-      request.body.email
-    );
-    const safeUser = Helpers.generateSafeUser(verifiedUser);
-
-    const accessToken = Services.generateAccessToken(
+    return Services.verifyUserAuth(
       response,
-      safeUser.id,
+      "Verifying Login",
+      "Logging in!",
+      request.body.email,
       request.body.thirtyDays
-    );
-
-    return response.status(Constants.HttpStatusCodes.OK).json(
-      Helpers.generateResponse({
-        body: "Logging in!",
-        response: { safeUser, accessToken },
-      })
     );
   } catch (error) {
     console.error(error);

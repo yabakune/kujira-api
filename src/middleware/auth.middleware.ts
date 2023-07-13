@@ -1,5 +1,4 @@
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
 import { NextFunction, Request, Response } from "express";
 import { PrismaClient, User } from "@prisma/client";
 
@@ -170,14 +169,6 @@ function checkIfUserProvidedIncorrectVerificationCode(
   }
 }
 
-function checkJWTExpired(jsonWebToken: string, secretKey: string): boolean {
-  let isExpired = false;
-  jwt.verify(jsonWebToken, secretKey, function <Error>(error: Error) {
-    if (error) isExpired = true;
-  });
-  return isExpired;
-}
-
 function checkIfVerificationCodeHasExpired(
   response: Response,
   next: NextFunction,
@@ -186,7 +177,7 @@ function checkIfVerificationCodeHasExpired(
   verificationCodeProvidedByClient: string
 ) {
   try {
-    const verificationCodeHasExpired = checkJWTExpired(
+    const verificationCodeHasExpired = Helpers.checkJWTExpired(
       verificationCodeInDatabase,
       secretKey
     );

@@ -1,10 +1,9 @@
 import jwt from "jsonwebtoken";
 import { Response } from "express";
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, User } from "@prisma/client";
 
 import * as Constants from "@/constants";
 import * as Helpers from "@/helpers";
-import * as Services from "@/services";
 import * as Validators from "@/validators";
 
 const prisma = new PrismaClient();
@@ -121,9 +120,15 @@ export async function loginUserAndEmailVerificationCode(
   }
 }
 
-export function generateAccessToken(
+// ========================================================================================= //
+// [ VERIFYING USER REGISTRATION / LOGIN ] ================================================= //
+// ========================================================================================= //
+
+async function authenticateUser(
   response: Response,
-  userId: number,
+  user: User,
+  authAction: "Verifying Registration" | "Verifying Login",
+  responseBody: string,
   thirtyDayExpiration: boolean = false
 ) {
   try {
@@ -131,10 +136,29 @@ export function generateAccessToken(
     if (!authSecretKey) {
       throw new Error();
     } else {
-      const accessToken = jwt.sign({ _id: userId.toString() }, authSecretKey, {
+      const accessToken = jwt.sign({ _id: user.id.toString() }, authSecretKey, {
         expiresIn: thirtyDayExpiration ? "30 days" : "7 days",
       });
-      return accessToken;
+
+      if (authAction === "Verifying Registration") {
+        await prisma.user.update({
+          where: { email: user.email },
+          data: { accessToken, verificationCode: null, emailVerified: true },
+        });
+      } else {
+        await prisma.user.update({
+          where: { email: user.email },
+          data: { accessToken, verificationCode: null },
+        });
+      }
+      const safeUser = Helpers.generateSafeUser(user);
+
+      return response.status(Constants.HttpStatusCodes.OK).json(
+        Helpers.generateResponse({
+          body: responseBody,
+          response: { safeUser },
+        })
+      );
     }
   } catch (error) {
     console.error(Constants.Errors.AUTH_SECRET_KEY_DOES_NOT_EXIST);
@@ -148,22 +172,33 @@ export function generateAccessToken(
   }
 }
 
-export async function generateVerifiedUser(
-  type: "Verifying Registration" | "Verifying Login",
-  email: string
+export async function verifyUserAuth(
+  response: Response,
+  authAction: "Verifying Registration" | "Verifying Login",
+  responseBody: string,
+  email: string,
+  thirtyDayExpiration: boolean = false
 ) {
-  const verifiedUser =
-    type === "Verifying Registration"
-      ? await prisma.user.update({
-          where: { email },
-          data: { verificationCode: null, emailVerified: true },
-        })
-      : await prisma.user.update({
-          where: { email },
-          data: { verificationCode: null },
-        });
+  try {
+    let user = await prisma.user.findUniqueOrThrow({
+      where: { email },
+    });
 
-  return verifiedUser;
+    return authenticateUser(
+      response,
+      user,
+      authAction,
+      responseBody,
+      thirtyDayExpiration
+    );
+  } catch (error) {
+    console.error(error);
+    return response.status(Constants.HttpStatusCodes.NOT_FOUND).json(
+      Helpers.generateErrorResponse({
+        body: Constants.Errors.ACCOUNT_DOES_NOT_EXIST,
+      })
+    );
+  }
 }
 
 export async function sendUserNewVerificationCode(

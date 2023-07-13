@@ -44,7 +44,7 @@ enum RouteBases {
   BUG_REPORTS = "/api/v1/bug-reports",
 }
 if (process.env.NODE_ENV === "production") {
-  app.use(RouteBases.AUTH, validateAuthorizedUser, Routes.authRouter);
+  app.use(RouteBases.AUTH, Routes.authRouter);
   app.use(RouteBases.USERS, validateAuthorizedUser, Routes.usersRouter);
   app.use(RouteBases.OVERVIEWS, validateAuthorizedUser, Routes.overviewsRouter);
   app.use(RouteBases.LOGBOOKS, validateAuthorizedUser, Routes.logbooksRouter);
