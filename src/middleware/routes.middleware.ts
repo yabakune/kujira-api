@@ -105,8 +105,10 @@ export function verifyClientPayload(
 // [ MIDDLEWARE THAT GATES ACCESS TO ROUTES THAT REQUIRE AUTHORIZED ACCESS ] =============== //
 // ========================================================================================= //
 
-type RequestWithUserId = Request<{}, {}, { userId: number }>;
-type RequestWithAccessToken = Request & { accessToken: string | JwtPayload };
+type RequestWithUserId = Request<{}, {}, {}, { userId: string }>;
+type RequestWithAccessToken = RequestWithUserId & {
+  accessToken: string | JwtPayload;
+};
 
 async function throwOnExpiredAccessToken(
   request: RequestWithUserId,
@@ -123,7 +125,7 @@ async function throwOnExpiredAccessToken(
 
     if (accessTokenExpired) {
       await prisma.user.update({
-        where: { id: request.body.userId },
+        where: { id: Number(request.query.userId) },
         data: { accessToken: null },
       });
       throw new Error();
@@ -136,7 +138,7 @@ async function throwOnExpiredAccessToken(
   } catch (error) {
     console.error(error, "Access token expired");
     console.error(
-      `User with ID ${request.body.userId} has an expired access token. They must log in again.`
+      `User with ID ${request.query.userId} has an expired access token. They must log in again.`
     );
     return response.status(Constants.HttpStatusCodes.FORBIDDEN).json(
       Helpers.generateErrorResponse({
@@ -155,7 +157,7 @@ async function throwOnMissingAccessToken(
   try {
     // const accessToken = request.header("authorization");
     const { accessToken } = await prisma.user.findUniqueOrThrow({
-      where: { id: request.body.userId },
+      where: { id: Number(request.query.userId) },
     });
 
     if (!accessToken) {
@@ -172,7 +174,7 @@ async function throwOnMissingAccessToken(
   } catch (error) {
     console.error(
       error,
-      `User with ID ${request.body.userId} does not have an access token.`
+      `User with ID ${request.query.userId} does not have an access token.`
     );
     return response.status(Constants.HttpStatusCodes.FORBIDDEN).json(
       Helpers.generateErrorResponse({
@@ -189,7 +191,9 @@ async function throwOnMissingAccount(
   authSecretKey: string
 ) {
   try {
-    await prisma.user.findUniqueOrThrow({ where: { id: request.body.userId } });
+    await prisma.user.findUniqueOrThrow({
+      where: { id: Number(request.query.userId) },
+    });
     return throwOnMissingAccessToken(request, response, next, authSecretKey);
   } catch (error) {
     console.error(error);
@@ -208,7 +212,7 @@ function throwOnMissingUserId(
   authSecretKey: string
 ) {
   try {
-    if (!request.body.userId) {
+    if (!request.query.userId) {
       throw new Error();
     } else {
       return throwOnMissingAccount(request, response, next, authSecretKey);
