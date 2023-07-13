@@ -232,3 +232,27 @@ export async function sendUserNewVerificationCode(
     );
   }
 }
+
+// ========================================================================================= //
+// [ LOG OUT USER ] ======================================================================== //
+// ========================================================================================= //
+
+export async function logout(response: Response, email: string) {
+  try {
+    await prisma.user.update({
+      where: { email },
+      data: { accessToken: null },
+    });
+
+    return response
+      .status(Constants.HttpStatusCodes.OK)
+      .json(Helpers.generateResponse({ body: "Logged out!" }));
+  } catch (error) {
+    console.error(error);
+    return response.status(Constants.HttpStatusCodes.NOT_FOUND).json(
+      Helpers.generateErrorResponse({
+        body: Constants.Errors.ACCOUNT_DOES_NOT_EXIST,
+      })
+    );
+  }
+}

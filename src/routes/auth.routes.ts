@@ -57,3 +57,9 @@ authRouter.post(
   Middleware.verifyClientPayload({ requiredData: ["email"] }),
   Controllers.sendNewVerificationCode
 );
+
+authRouter.patch(
+  "/logout",
+  Middleware.verifyClientPayload({ requiredData: ["email"] }),
+  Controllers.logout
+);

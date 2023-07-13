@@ -5,10 +5,6 @@ import * as Helpers from "@/helpers";
 import * as Services from "@/services";
 import * as Validators from "@/validators";
 
-// ========================================================================================= //
-// [ REGISTER NEW USER ] =================================================================== //
-// ========================================================================================= //
-
 export async function register(
   request: Request<{}, {}, Validators.RegistrationValidator>,
   response: Response
@@ -36,10 +32,6 @@ export async function register(
   }
 }
 
-// ========================================================================================= //
-// [ LOGIN EXISTING USER ] ================================================================= //
-// ========================================================================================= //
-
 export async function login(
   request: Request<{}, {}, Validators.LoginValidator>,
   response: Response
@@ -60,10 +52,6 @@ export async function login(
       );
   }
 }
-
-// ========================================================================================= //
-// [ VERIFY REGISTRATION ] ================================================================= //
-// ========================================================================================= //
 
 export async function verifyRegistration(
   request: Request<{}, {}, Validators.VerificationCodeValidator>,
@@ -88,10 +76,6 @@ export async function verifyRegistration(
       );
   }
 }
-
-// ========================================================================================= //
-// [ VERIFY LOGIN ] ======================================================================== //
-// ========================================================================================= //
 
 export async function verifyLogin(
   request: Request<
@@ -121,10 +105,6 @@ export async function verifyLogin(
   }
 }
 
-// ========================================================================================= //
-// [ SEND NEW VERIFICATION CODE ] ========================================================== //
-// ========================================================================================= //
-
 export async function sendNewVerificationCode(
   request: Request<{}, {}, { email: string }>,
   response: Response
@@ -149,4 +129,11 @@ export async function sendNewVerificationCode(
       })
     );
   }
+}
+
+export async function logout(
+  request: Request<{}, {}, { email: string }>,
+  response: Response
+) {
+  return Services.logout(response, request.body.email);
 }
