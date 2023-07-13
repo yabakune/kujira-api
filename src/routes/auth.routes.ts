@@ -14,7 +14,8 @@ const RequiredRegistrationData: Validators.RequiredRegistrationData = [
 authRouter.post(
   "/register",
   Middleware.verifyClientPayload({ requiredData: RequiredRegistrationData }),
-  Middleware.validateAccountDoesNotExist,
+  Middleware.validateEmailNotTaken,
+  Middleware.validateUsernameNotTaken,
   Controllers.register
 );
 

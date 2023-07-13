@@ -10,7 +10,7 @@ import * as Validators from "@/validators";
 
 const prisma = new PrismaClient();
 
-export async function validateAccountDoesNotExist(
+export async function validateEmailNotTaken(
   request: Request<{}, {}, { email: string }>,
   response: Response,
   next: NextFunction
@@ -29,7 +29,32 @@ export async function validateAccountDoesNotExist(
     console.error(error);
     return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
       Helpers.generateErrorResponse({
-        body: Constants.Errors.ACCOUNT_ALREADY_EXISTS,
+        body: "Email already taken.",
+      })
+    );
+  }
+}
+
+export async function validateUsernameNotTaken(
+  request: Request<{}, {}, { username: string }>,
+  response: Response,
+  next: NextFunction
+) {
+  try {
+    const user = await prisma.user.findUnique({
+      where: { username: request.body.username },
+    });
+
+    if (user) {
+      throw new Error();
+    } else {
+      return next();
+    }
+  } catch (error) {
+    console.error(error);
+    return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
+      Helpers.generateErrorResponse({
+        body: "Username already taken.",
       })
     );
   }
