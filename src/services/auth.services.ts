@@ -222,7 +222,12 @@ export async function sendUserNewVerificationCode(
       "If this is a mistake, you can safely ignore this email.",
     ]);
 
-    return safeUser;
+    return response.status(Constants.HttpStatusCodes.OK).json(
+      Helpers.generateResponse({
+        body: "New verification code sent! Please check your email.",
+        response: { safeUser },
+      })
+    );
   } catch (error) {
     console.error(error);
     return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(

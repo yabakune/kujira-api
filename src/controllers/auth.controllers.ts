@@ -110,17 +110,7 @@ export async function sendNewVerificationCode(
   response: Response
 ) {
   try {
-    const safeUser = await Services.sendUserNewVerificationCode(
-      response,
-      request.body.email
-    );
-
-    return response.status(Constants.HttpStatusCodes.OK).json(
-      Helpers.generateResponse({
-        body: "New verification code sent! Please check your email.",
-        response: { safeUser },
-      })
-    );
+    return Services.sendUserNewVerificationCode(response, request.body.email);
   } catch (error) {
     console.error(error);
     return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
