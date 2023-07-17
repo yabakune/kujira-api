@@ -6,9 +6,9 @@ import * as Validators from "@/validators";
 
 export const overviewsRouter = express.Router();
 
-overviewsRouter.get("/", Controllers.getOverviews);
+overviewsRouter.get("/", Controllers.fetchOverviews);
 
-overviewsRouter.get("/:overviewId", Controllers.getOverview);
+overviewsRouter.get("/:overviewId", Controllers.fetchOverview);
 
 const requiredOverviewCreateData: Validators.RequiredOverviewCreateData = [
   "income",

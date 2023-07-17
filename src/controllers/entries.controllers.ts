@@ -3,15 +3,15 @@ import { Request, Response } from "express";
 import * as Services from "@/services";
 import * as Validators from "@/validators";
 
-export async function getEntries(_: Request, response: Response) {
-  return Services.getEntries(response);
+export async function fetchEntries(_: Request, response: Response) {
+  return Services.fetchEntries(response);
 }
 
-export async function getEntry(
+export async function fetchEntry(
   request: Request<{ entryId: string }>,
   response: Response
 ) {
-  return Services.getEntry(response, Number(request.params.entryId));
+  return Services.fetchEntry(response, Number(request.params.entryId));
 }
 
 export async function createEntry(

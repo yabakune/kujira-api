@@ -6,9 +6,9 @@ import * as Validators from "@/validators";
 
 export const purchasesRouter = express.Router();
 
-purchasesRouter.get("/", Controllers.getPurchases);
+purchasesRouter.get("/", Controllers.fetchPurchases);
 
-purchasesRouter.get("/:purchaseId", Controllers.getPurchase);
+purchasesRouter.get("/:purchaseId", Controllers.fetchPurchase);
 
 const requiredPurchaseCreateData: Validators.RequiredPurchaseCreateData = [
   "category",

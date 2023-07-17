@@ -3,15 +3,15 @@ import { Request, Response } from "express";
 import * as Services from "@/services";
 import * as Validators from "@/validators";
 
-export async function getPurchases(_: Request, response: Response) {
-  return Services.getPurchases(response);
+export async function fetchPurchases(_: Request, response: Response) {
+  return Services.fetchPurchases(response);
 }
 
-export async function getPurchase(
+export async function fetchPurchase(
   request: Request<{ purchaseId: string }>,
   response: Response
 ) {
-  return Services.getPurchase(response, Number(request.params.purchaseId));
+  return Services.fetchPurchase(response, Number(request.params.purchaseId));
 }
 
 export async function createPurchase(

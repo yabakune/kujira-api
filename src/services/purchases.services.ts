@@ -7,7 +7,7 @@ import * as Validators from "@/validators";
 
 const prisma = new PrismaClient();
 
-export async function getPurchases(response: Response) {
+export async function fetchPurchases(response: Response) {
   try {
     const purchases = await prisma.purchase.findMany({
       orderBy: { id: "asc" },
@@ -31,7 +31,7 @@ export async function getPurchases(response: Response) {
   }
 }
 
-export async function getPurchase(response: Response, purchaseId: number) {
+export async function fetchPurchase(response: Response, purchaseId: number) {
   try {
     const purchase = await prisma.purchase.findUniqueOrThrow({
       where: { id: purchaseId },

@@ -3,15 +3,15 @@ import { Request, Response } from "express";
 import * as Services from "@/services";
 import * as Validators from "@/validators";
 
-export async function getOverviews(_: Request, response: Response) {
-  return Services.getOverviews(response);
+export async function fetchOverviews(_: Request, response: Response) {
+  return Services.fetchOverviews(response);
 }
 
-export async function getOverview(
+export async function fetchOverview(
   request: Request<{ overviewId: string }>,
   response: Response
 ) {
-  return Services.getOverview(response, Number(request.params.overviewId));
+  return Services.fetchOverview(response, Number(request.params.overviewId));
 }
 
 export async function createOverview(

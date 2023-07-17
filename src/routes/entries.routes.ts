@@ -6,9 +6,9 @@ import * as Validators from "@/validators";
 
 export const entriesRouter = express.Router();
 
-entriesRouter.get("/", Controllers.getEntries);
+entriesRouter.get("/", Controllers.fetchEntries);
 
-entriesRouter.get("/:entryId", Controllers.getEntry);
+entriesRouter.get("/:entryId", Controllers.fetchEntry);
 
 const requiredEntryCreateData: Validators.RequiredEntryCreateData = ["name"];
 const optionalEntryCreateData: Validators.OptionalEntryCreateData = [
