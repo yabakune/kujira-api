@@ -6,9 +6,9 @@ import * as Validators from "@/validators";
 
 export const usersRouter = express.Router();
 
-usersRouter.get("/", Controllers.getUsers);
+usersRouter.get("/", Controllers.fetchUsers);
 
-usersRouter.get("/:userId", Controllers.getUser);
+usersRouter.get("/:userId", Controllers.fetchUser);
 
 const optionalUserUpdateData: Validators.OptionalUserUpdateData = [
   "email",

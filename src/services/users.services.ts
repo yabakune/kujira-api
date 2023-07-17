@@ -24,7 +24,7 @@ function generateSafeUsers(users: User[]) {
   ]);
 }
 
-export async function getUsers(response: Response) {
+export async function fetchUsers(response: Response) {
   try {
     const users = await prisma.user.findMany({ orderBy: { id: "asc" } });
     const safeUsers = generateSafeUsers(users);
@@ -47,7 +47,7 @@ export async function getUsers(response: Response) {
   }
 }
 
-export async function getUser(response: Response, userId: number) {
+export async function fetchUser(response: Response, userId: number) {
   try {
     const user = await prisma.user.findUniqueOrThrow({
       where: { id: userId },
