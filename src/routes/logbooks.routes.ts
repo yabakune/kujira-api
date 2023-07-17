@@ -6,9 +6,20 @@ import * as Validators from "@/validators";
 
 export const logbooksRouter = express.Router();
 
-logbooksRouter.get("/", Controllers.getLogbooks);
+logbooksRouter.get("/", Controllers.fetchLogbooks);
 
-logbooksRouter.get("/:logbookId", Controllers.getLogbook);
+logbooksRouter.get("/:logbookId", Controllers.fetchLogbook);
+
+const requiredUserLogbooksFetchData: Validators.RequiredUserLogbooksData = [
+  "ownerId",
+];
+logbooksRouter.post(
+  "/",
+  Middleware.verifyClientPayload({
+    requiredData: requiredUserLogbooksFetchData,
+  }),
+  Controllers.fetchUserLogbooks
+);
 
 const requiredLogbookCreateData: Validators.RequiredLogbookCreateData = [
   "name",

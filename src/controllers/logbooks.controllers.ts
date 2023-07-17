@@ -3,15 +3,22 @@ import { Request, Response } from "express";
 import * as Services from "@/services";
 import * as Validators from "@/validators";
 
-export async function getLogbooks(_: Request, response: Response) {
-  return Services.getLogbooks(response);
+export async function fetchLogbooks(_: Request, response: Response) {
+  return Services.fetchLogbooks(response);
 }
 
-export async function getLogbook(
+export async function fetchLogbook(
   request: Request<{ logbookId: string }>,
   response: Response
 ) {
-  return Services.getLogbook(response, Number(request.params.logbookId));
+  return Services.fetchLogbook(response, Number(request.params.logbookId));
+}
+
+export async function fetchUserLogbooks(
+  request: Request<{}, {}, Validators.RequiredUserLogbooksFetchValidator>,
+  response: Response
+) {
+  return Services.fetchUserLogbooks(response, request.body.ownerId);
 }
 
 export async function createLogbook(

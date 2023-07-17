@@ -7,7 +7,7 @@ import * as Validators from "@/validators";
 
 const prisma = new PrismaClient();
 
-export async function getLogbooks(response: Response) {
+export async function fetchLogbooks(response: Response) {
   try {
     const logbooks = await prisma.logbook.findMany({ orderBy: { id: "asc" } });
 
@@ -29,7 +29,7 @@ export async function getLogbooks(response: Response) {
   }
 }
 
-export async function getLogbook(response: Response, logbookId: number) {
+export async function fetchLogbook(response: Response, logbookId: number) {
   try {
     const logbook = await prisma.logbook.findUniqueOrThrow({
       where: { id: logbookId },
@@ -39,6 +39,26 @@ export async function getLogbook(response: Response, logbookId: number) {
       Helpers.generateResponse({
         body: "Fetched logbook!",
         response: logbook,
+      })
+    );
+  } catch (error) {
+    console.error(error);
+    return response.status(Constants.HttpStatusCodes.NOT_FOUND).json(
+      Helpers.generateErrorResponse({
+        body: Constants.Errors.LOGBOOK_DOES_NOT_EXIST,
+      })
+    );
+  }
+}
+
+export async function fetchUserLogbooks(response: Response, ownerId: number) {
+  try {
+    const logbooks = await prisma.logbook.findMany({ where: { ownerId } });
+
+    return response.status(Constants.HttpStatusCodes.OK).json(
+      Helpers.generateResponse({
+        body: "Fetched logbooks!",
+        response: logbooks,
       })
     );
   } catch (error) {
@@ -113,14 +133,12 @@ export async function deleteLogbook(response: Response, logbookId: number) {
   try {
     await prisma.logbook.delete({ where: { id: logbookId } });
 
-    return response
-      .status(Constants.HttpStatusCodes.OK)
-      .json(
-        Helpers.generateResponse({
-          body: "Deleted logbook!",
-          response: logbookId,
-        })
-      );
+    return response.status(Constants.HttpStatusCodes.OK).json(
+      Helpers.generateResponse({
+        body: "Deleted logbook!",
+        response: logbookId,
+      })
+    );
   } catch (error) {
     console.error(error);
     return response.status(Constants.HttpStatusCodes.NOT_FOUND).json(
