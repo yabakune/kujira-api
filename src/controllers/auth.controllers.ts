@@ -122,8 +122,8 @@ export async function sendNewVerificationCode(
 }
 
 export async function logout(
-  request: Request<{}, {}, { email: string }>,
+  request: Request<{}, {}, { userId: number }>,
   response: Response
 ) {
-  return Services.logout(response, request.body.email);
+  return Services.logout(response, request.body.userId);
 }

@@ -61,6 +61,6 @@ authRouter.post(
 
 authRouter.patch(
   "/logout",
-  Middleware.verifyClientPayload({ requiredData: ["email"] }),
+  Middleware.verifyClientPayload({ requiredData: ["userId"] }),
   Controllers.logout
 );

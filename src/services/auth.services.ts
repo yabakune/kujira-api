@@ -242,10 +242,10 @@ export async function sendUserNewVerificationCode(
 // [ LOG OUT USER ] ======================================================================== //
 // ========================================================================================= //
 
-export async function logout(response: Response, email: string) {
+export async function logout(response: Response, userId: number) {
   try {
     await prisma.user.update({
-      where: { email },
+      where: { id: userId },
       data: { accessToken: null },
     });
 
