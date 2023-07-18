@@ -124,6 +124,97 @@ export async function loginUserAndEmailVerificationCode(
 // [ VERIFYING USER REGISTRATION / LOGIN ] ================================================= //
 // ========================================================================================= //
 
+const months: { [key: string]: string } = {
+  0: "January",
+  1: "February",
+  2: "March",
+  3: "April",
+  4: "May",
+  5: "June",
+  6: "July",
+  7: "August",
+  8: "September",
+  9: "October",
+  10: "November",
+  11: "December",
+};
+
+function formatDateToName(): string {
+  const today = new Date();
+  const month = months[today.getMonth()];
+  const year = today.getFullYear();
+  return `${month} ${year}}`;
+}
+
+async function verifyRegistration(
+  response: Response,
+  user: User,
+  accessToken: string
+) {
+  try {
+    const { id: userId } = await prisma.user.update({
+      where: { email: user.email },
+      data: { accessToken, verificationCode: null, emailVerified: true },
+    });
+
+    const { id: overviewId } = await prisma.overview.create({
+      data: { income: 0, ownerId: userId },
+    });
+
+    await prisma.logbook.create({
+      data: {
+        name: formatDateToName(),
+        ownerId: userId,
+      },
+    });
+
+    await prisma.entry.createMany({
+      data: [
+        { name: "Recurring", overviewId },
+        { name: "Incoming", overviewId },
+      ],
+      skipDuplicates: true,
+    });
+
+    // Just exit this function and move onto the next step if everything's 👍
+    return;
+  } catch (error) {
+    console.error(error);
+    return response
+      .status(Constants.HttpStatusCodes.INTERNAL_SERVER_ERROR)
+      .json(
+        Helpers.generateErrorResponse({
+          body: "An error occurred while verifying your registration. Please refresh the page and try again.",
+        })
+      );
+  }
+}
+
+async function verifyLogin(
+  response: Response,
+  user: User,
+  accessToken: string
+) {
+  try {
+    await prisma.user.update({
+      where: { email: user.email },
+      data: { accessToken, verificationCode: null },
+    });
+
+    // Just exit this function and move onto the next step if everything's 👍
+    return;
+  } catch (error) {
+    console.error(error);
+    return response
+      .status(Constants.HttpStatusCodes.INTERNAL_SERVER_ERROR)
+      .json(
+        Helpers.generateErrorResponse({
+          body: "An error occurred while verifying your login. Please refresh the page and try again.",
+        })
+      );
+  }
+}
+
 async function authenticateUser(
   response: Response,
   user: User,
@@ -141,16 +232,11 @@ async function authenticateUser(
       });
 
       if (authAction === "Verifying Registration") {
-        await prisma.user.update({
-          where: { email: user.email },
-          data: { accessToken, verificationCode: null, emailVerified: true },
-        });
+        verifyRegistration(response, user, accessToken);
       } else {
-        await prisma.user.update({
-          where: { email: user.email },
-          data: { accessToken, verificationCode: null },
-        });
+        verifyLogin(response, user, accessToken);
       }
+
       const safeUser = Helpers.generateSafeUser(user);
 
       return response.status(Constants.HttpStatusCodes.OK).json(
