@@ -50,6 +50,33 @@ export async function fetchEntry(response: Response, entryId: number) {
   }
 }
 
+export async function fetchLogbookEntries(
+  response: Response,
+  logbookId: number
+) {
+  try {
+    const logbookEntries = await prisma.entry.findMany({
+      where: { logbookId },
+    });
+
+    return response.status(Constants.HttpStatusCodes.OK).json(
+      Helpers.generateResponse({
+        body: "Fetched logbook entries!",
+        response: logbookEntries,
+      })
+    );
+  } catch (error) {
+    console.error(error);
+    return response
+      .status(Constants.HttpStatusCodes.INTERNAL_SERVER_ERROR)
+      .json(
+        Helpers.generateErrorResponse({
+          body: "There was an error fetching entries. Please refresh the page.",
+        })
+      );
+  }
+}
+
 export async function createEntry(
   response: Response,
   name: string,

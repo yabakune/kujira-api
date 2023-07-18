@@ -10,6 +10,14 @@ entriesRouter.get("/", Controllers.fetchEntries);
 
 entriesRouter.get("/:entryId", Controllers.fetchEntry);
 
+entriesRouter.post(
+  "/fetch-logbook-entries",
+  Middleware.verifyClientPayload({
+    requiredData: ["logbookId"],
+  }),
+  Controllers.fetchLogbookEntries
+);
+
 const requiredEntryCreateData: Validators.RequiredEntryCreateData = ["name"];
 const optionalEntryCreateData: Validators.OptionalEntryCreateData = [
   "overviewId",
