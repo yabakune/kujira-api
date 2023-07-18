@@ -157,15 +157,15 @@ async function verifyRegistration(
       data: { accessToken, verificationCode: null, emailVerified: true },
     });
 
-    const { id: overviewId } = await prisma.overview.create({
-      data: { income: 0, ownerId: userId },
-    });
-
-    await prisma.logbook.create({
+    const { id: logbookId } = await prisma.logbook.create({
       data: {
         name: formatDateToName(),
         ownerId: userId,
       },
+    });
+
+    const { id: overviewId } = await prisma.overview.create({
+      data: { income: 0, logbookId },
     });
 
     await prisma.entry.createMany({

@@ -10,9 +10,17 @@ overviewsRouter.get("/", Controllers.fetchOverviews);
 
 overviewsRouter.get("/:overviewId", Controllers.fetchOverview);
 
+overviewsRouter.post(
+  "/fetch-logbook-overview",
+  Middleware.verifyClientPayload({
+    requiredData: ["logbookId"],
+  }),
+  Controllers.fetchLogbookOverview
+);
+
 const requiredOverviewCreateData: Validators.RequiredOverviewCreateData = [
   "income",
-  "ownerId",
+  "logbookId",
 ];
 const optionalOverviewCreateData: Validators.RequiredOverviewCreateData = [
   "savings",

@@ -51,17 +51,40 @@ export async function fetchOverview(response: Response, overviewId: number) {
   }
 }
 
+export async function fetchLogbookOverview(
+  response: Response,
+  logbookId: number
+) {
+  try {
+    const overview = await prisma.overview.findUniqueOrThrow({
+      where: { logbookId },
+    });
+
+    return response.status(Constants.HttpStatusCodes.OK).json(
+      Helpers.generateResponse({
+        body: "Fetched logbook overview!",
+        response: overview,
+      })
+    );
+  } catch (error) {
+    console.error(error);
+    return response.status(Constants.HttpStatusCodes.NOT_FOUND).json({
+      body: Constants.Errors.OVERVIEW_DOES_NOT_EXIST,
+    });
+  }
+}
+
 export async function createOverview(
   response: Response,
   income: number,
   savings: number = 0,
-  ownerId: number
+  logbookId: number
 ) {
   try {
     const data: Validators.OverviewCreateValidator = {
       income,
       savings,
-      ownerId,
+      logbookId,
     };
 
     const overview = await prisma.overview.create({ data });

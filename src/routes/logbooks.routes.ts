@@ -14,7 +14,7 @@ const requiredUserLogbooksFetchData: Validators.RequiredUserLogbooksData = [
   "ownerId",
 ];
 logbooksRouter.post(
-  "/",
+  "/fetch-user-logbooks",
   Middleware.verifyClientPayload({
     requiredData: requiredUserLogbooksFetchData,
   }),

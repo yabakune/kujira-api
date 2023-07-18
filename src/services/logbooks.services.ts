@@ -65,7 +65,7 @@ export async function fetchUserLogbooks(response: Response, ownerId: number) {
     console.error(error);
     return response.status(Constants.HttpStatusCodes.NOT_FOUND).json(
       Helpers.generateErrorResponse({
-        body: Constants.Errors.LOGBOOK_DOES_NOT_EXIST,
+        body: "There was a problem with fetching your logbooks. Please refresh the page and try again.",
       })
     );
   }

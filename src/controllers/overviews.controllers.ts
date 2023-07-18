@@ -14,6 +14,13 @@ export async function fetchOverview(
   return Services.fetchOverview(response, Number(request.params.overviewId));
 }
 
+export async function fetchLogbookOverview(
+  request: Request<{}, {}, { logbookId: number }>,
+  response: Response
+) {
+  return Services.fetchLogbookOverview(response, request.body.logbookId);
+}
+
 export async function createOverview(
   request: Request<{}, {}, Validators.OverviewCreateValidator>,
   response: Response
@@ -22,7 +29,7 @@ export async function createOverview(
     response,
     request.body.income,
     request.body.savings,
-    request.body.ownerId
+    request.body.logbookId
   );
 }
 

@@ -3,7 +3,7 @@ import { Prisma } from "@prisma/client";
 const overviewCreateValidator = Prisma.validator<Prisma.OverviewArgs>()({
   select: {
     income: true,
-    ownerId: true,
+    logbookId: true,
   },
 });
 export type OverviewCreateValidator = Prisma.OverviewGetPayload<
