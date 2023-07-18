@@ -38,7 +38,6 @@ model User {
   // One To One
   profile          Profile?
   // Has Many
-  overviews        Overview[]
   logbooks         Logbook[]
   bugReports       BugReport[]
 }
@@ -61,21 +60,23 @@ model Overview {
   savings   Float    @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  // Belongs To
-  owner     User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  ownerId   Int      @unique
+  // One To One
+  logbook   Logbook  @relation(fields: [logbookId], references: [id], onDelete: Cascade)
+  logbookId Int      @unique
   // Has Many
   entries   Entry[]
 }
 
 model Logbook {
-  id        Int      @id @default(autoincrement())
+  id        Int       @id @default(autoincrement())
   name      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
   // Belongs to
-  owner     User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  owner     User      @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   ownerId   Int
+  // One To One
+  overview  Overview?
   // Has Many
   entries   Entry[]
 }
