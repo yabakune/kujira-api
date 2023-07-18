@@ -50,6 +50,33 @@ export async function fetchEntry(response: Response, entryId: number) {
   }
 }
 
+export async function fetchOverviewEntries(
+  response: Response,
+  overviewId: number
+) {
+  try {
+    const overviewEntries = await prisma.entry.findMany({
+      where: { overviewId },
+    });
+
+    return response.status(Constants.HttpStatusCodes.OK).json(
+      Helpers.generateResponse({
+        body: "Fetched overview entries!",
+        response: overviewEntries,
+      })
+    );
+  } catch (error) {
+    console.error(error);
+    return response
+      .status(Constants.HttpStatusCodes.INTERNAL_SERVER_ERROR)
+      .json(
+        Helpers.generateErrorResponse({
+          body: "There was an error fetching entries. Please refresh the page.",
+        })
+      );
+  }
+}
+
 export async function fetchLogbookEntries(
   response: Response,
   logbookId: number

@@ -11,6 +11,14 @@ entriesRouter.get("/", Controllers.fetchEntries);
 entriesRouter.get("/:entryId", Controllers.fetchEntry);
 
 entriesRouter.post(
+  "/fetch-overview-entries",
+  Middleware.verifyClientPayload({
+    requiredData: ["overviewId"],
+  }),
+  Controllers.fetchOverviewEntries
+);
+
+entriesRouter.post(
   "/fetch-logbook-entries",
   Middleware.verifyClientPayload({
     requiredData: ["logbookId"],

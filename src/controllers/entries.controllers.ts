@@ -14,6 +14,13 @@ export async function fetchEntry(
   return Services.fetchEntry(response, Number(request.params.entryId));
 }
 
+export async function fetchOverviewEntries(
+  request: Request<{}, {}, { overviewId: number }>,
+  response: Response
+) {
+  return Services.fetchOverviewEntries(response, request.body.overviewId);
+}
+
 export async function fetchLogbookEntries(
   request: Request<{}, {}, { logbookId: number }>,
   response: Response
