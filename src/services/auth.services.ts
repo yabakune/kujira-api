@@ -143,7 +143,7 @@ function formatDateToName(): string {
   const today = new Date();
   const month = months[today.getMonth()];
   const year = today.getFullYear();
-  return `${month} ${year}}`;
+  return `${month} ${year}`;
 }
 
 async function verifyRegistration(
