@@ -332,10 +332,7 @@ export async function sendUserNewVerificationCode(
 // [ PASSWORD RESET ] ====================================================================== //
 // ========================================================================================= //
 
-export async function sendPasswordResetVerificationCode(
-  response: Response,
-  email: string
-) {
+export async function requestPasswordReset(response: Response, email: string) {
   try {
     const { verificationCode, decodedVerificationCode } =
       generateAuthVerificationCodes();
@@ -363,6 +360,33 @@ export async function sendPasswordResetVerificationCode(
     return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
       Helpers.generateErrorResponse({
         body: Constants.Errors.ACCOUNT_DOES_NOT_EXIST,
+      })
+    );
+  }
+}
+
+export async function verifyPasswordResetRequest(
+  response: Response,
+  email: string
+) {
+  try {
+    await prisma.user.update({
+      where: { email },
+      data: { verificationCode: null },
+    });
+
+    return response
+      .status(Constants.HttpStatusCodes.OK)
+      .json(
+        Helpers.generateResponse({
+          body: "Verified! Please enter your new password in the next step.",
+        })
+      );
+  } catch (error) {
+    console.error(error);
+    return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
+      Helpers.generateErrorResponse({
+        body: "Failed to verify password reset. Please refresh the page and try again.",
       })
     );
   }

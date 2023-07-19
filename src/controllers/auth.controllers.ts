@@ -121,14 +121,18 @@ export async function sendNewVerificationCode(
   }
 }
 
-export function sendPasswordResetVerificationCode(
+export function requestPasswordReset(
   request: Request<{}, {}, { email: string }>,
   response: Response
 ) {
-  return Services.sendPasswordResetVerificationCode(
-    response,
-    request.body.email
-  );
+  return Services.requestPasswordReset(response, request.body.email);
+}
+
+export function verifyPasswordResetRequest(
+  request: Request<{}, {}, Validators.VerificationCodeValidator>,
+  response: Response
+) {
+  return Services.verifyPasswordResetRequest(response, request.body.email);
 }
 
 export function resetUserPassword(

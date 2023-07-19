@@ -60,9 +60,18 @@ authRouter.post(
 );
 
 authRouter.post(
-  "/send-password-reset-verification-code",
+  "/request-password-reset",
   Middleware.verifyClientPayload({ requiredData: ["email"] }),
-  Controllers.sendPasswordResetVerificationCode
+  Controllers.requestPasswordReset
+);
+
+authRouter.post(
+  "/verify-password-reset-request",
+  Middleware.verifyClientPayload({
+    requiredData: requiredVerificationCodeData,
+  }),
+  Middleware.validateVerificationCode,
+  Controllers.verifyPasswordResetRequest
 );
 
 authRouter.post(
