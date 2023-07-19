@@ -53,7 +53,10 @@ export async function fetchLogbook(response: Response, logbookId: number) {
 
 export async function fetchUserLogbooks(response: Response, ownerId: number) {
   try {
-    const logbooks = await prisma.logbook.findMany({ where: { ownerId } });
+    const logbooks = await prisma.logbook.findMany({
+      where: { ownerId },
+      include: { overview: { select: { id: true } } },
+    });
 
     return response.status(Constants.HttpStatusCodes.OK).json(
       Helpers.generateResponse({
