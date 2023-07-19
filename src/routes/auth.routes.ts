@@ -67,7 +67,8 @@ authRouter.post(
 
 authRouter.post(
   "/reset-password",
-  Middleware.verifyClientPayload({ requiredData: ["email"] })
+  Middleware.verifyClientPayload({ requiredData: ["email", "newPassword"] }),
+  Controllers.resetUserPassword
 );
 
 authRouter.patch(

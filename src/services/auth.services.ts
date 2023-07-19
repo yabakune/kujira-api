@@ -368,79 +368,33 @@ export async function sendPasswordResetVerificationCode(
   }
 }
 
-// async function resetPassword(
-//   response: Response,
-//   email: string,
-//   encryptedPassword: string
-// ) {
-//   try {
-//     await prisma.user.update({
-//       where: { email },
-//       data: { password: encryptedPassword },
-//     });
+export async function resetUserPassword(
+  response: Response,
+  email: string,
+  newPassword: string
+) {
+  try {
+    const encryptedPassword = await Helpers.encryptPassword(newPassword);
 
-//     return response.status(Constants.HttpStatusCodes.OK).json(
-//       Helpers.generateResponse({
-//         body: "Your password has been reset! Please log in.",
-//       })
-//     );
-//   } catch (error) {
-//     console.error(error);
-//     return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
-//       Helpers.generateErrorResponse({
-//         body: "Failed reset password. Please try again.",
-//       })
-//     );
-//   }
-// }
+    await prisma.user.update({
+      where: { email },
+      data: { password: encryptedPassword },
+    });
 
-// async function sendVerificationCode(
-//   response: Response,
-//   email: string,
-//   encryptedPassword: string
-// ) {
-//   try {
-//   } catch (error) {
-//     console.error(error);
-//     return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
-//       Helpers.generateErrorResponse({
-//         body: "Failed to send verification code. Please try again.",
-//       })
-//     );
-//   }
-// }
-
-// async function resetUserPassword(
-//   response: Response,
-//   email: string,
-//   newPassword: string
-// ) {
-//   try {
-//     const encryptedPassword = await Helpers.encryptPassword(newPassword);
-//     const { verificationCode, decodedVerificationCode } =
-//       generateAuthVerificationCodes();
-
-//     await prisma.user.update({
-//       where: { email },
-//       data: { verificationCode },
-//     });
-
-//     await Helpers.emailUser(email, "Kujira: Password Reset", [
-//       "This email is in response to your request to reset your password.",
-//       `Please copy and paste the following verification code into the app to verify your account: ${decodedVerificationCode}`,
-//       "If this is a mistake, you can safely ignore this email.",
-//     ]);
-
-//     resetPassword(response, email, encryptedPassword);
-//   } catch (error) {
-//     console.error(error);
-//     return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
-//       Helpers.generateErrorResponse({
-//         body: "An account with that email does not exist.",
-//       })
-//     );
-//   }
-// }
+    return response.status(Constants.HttpStatusCodes.OK).json(
+      Helpers.generateResponse({
+        body: "Your password has been reset! Please log in.",
+      })
+    );
+  } catch (error) {
+    console.error(error);
+    return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
+      Helpers.generateErrorResponse({
+        body: Constants.Errors.ACCOUNT_DOES_NOT_EXIST,
+      })
+    );
+  }
+}
 
 // ========================================================================================= //
 // [ LOG OUT USER ] ======================================================================== //

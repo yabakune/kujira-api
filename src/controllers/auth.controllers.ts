@@ -131,6 +131,17 @@ export function sendPasswordResetVerificationCode(
   );
 }
 
+export function resetUserPassword(
+  request: Request<{}, {}, { email: string; newPassword: string }>,
+  response: Response
+) {
+  return Services.resetUserPassword(
+    response,
+    request.body.email,
+    request.body.newPassword
+  );
+}
+
 export async function logout(
   request: Request<{}, {}, { userId: number }>,
   response: Response
