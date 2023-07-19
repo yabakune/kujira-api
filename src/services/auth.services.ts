@@ -69,7 +69,7 @@ export async function registerNewUserAndEmailVerificationCode(
 
     return response.status(Constants.HttpStatusCodes.CREATED).json(
       Helpers.generateResponse({
-        title: "Thank you for registering with Kujira!",
+        title: "Verify Registration",
         body: "A verification code was sent to your email. Please enter it below.",
         caption: "Note that your code will expire within 5 minutes.",
       })
@@ -105,7 +105,7 @@ export async function loginUserAndEmailVerificationCode(
 
     return response.status(Constants.HttpStatusCodes.CREATED).json(
       Helpers.generateResponse({
-        title: "Welcome back!",
+        title: "Verify Login",
         body: "A verification code was sent to your email. Please enter it below.",
         caption: "Note that your code will expire within 5 minutes.",
       })
@@ -287,6 +287,10 @@ export async function verifyUserAuth(
   }
 }
 
+// ========================================================================================= //
+// [ SEND NEW VERIFICATION CODE ] ========================================================== //
+// ========================================================================================= //
+
 export async function sendUserNewVerificationCode(
   response: Response,
   email: string
@@ -297,7 +301,7 @@ export async function sendUserNewVerificationCode(
 
     const userWithNewVerificationCode = await prisma.user.update({
       where: { email },
-      data: { verificationCode: verificationCode },
+      data: { verificationCode },
     });
 
     const safeUser = Helpers.generateSafeUser(userWithNewVerificationCode);
@@ -323,6 +327,120 @@ export async function sendUserNewVerificationCode(
     );
   }
 }
+
+// ========================================================================================= //
+// [ PASSWORD RESET ] ====================================================================== //
+// ========================================================================================= //
+
+export async function sendPasswordResetVerificationCode(
+  response: Response,
+  email: string
+) {
+  try {
+    const { verificationCode, decodedVerificationCode } =
+      generateAuthVerificationCodes();
+
+    await prisma.user.update({
+      where: { email },
+      data: { verificationCode },
+    });
+
+    await Helpers.emailUser(email, "Kujira: Password Reset", [
+      "This email is in response to your request to reset your password.",
+      `Please copy and paste the following verification code into the app to verify your account: ${decodedVerificationCode}`,
+      "If this is a mistake, you can safely ignore this email.",
+    ]);
+
+    return response.status(Constants.HttpStatusCodes.CREATED).json(
+      Helpers.generateResponse({
+        title: "Verify Password Reset",
+        body: "A verification code was sent to your email. Please enter it below.",
+        caption: "Note that your code will expire within 5 minutes.",
+      })
+    );
+  } catch (error) {
+    console.error(error);
+    return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
+      Helpers.generateErrorResponse({
+        body: Constants.Errors.ACCOUNT_DOES_NOT_EXIST,
+      })
+    );
+  }
+}
+
+// async function resetPassword(
+//   response: Response,
+//   email: string,
+//   encryptedPassword: string
+// ) {
+//   try {
+//     await prisma.user.update({
+//       where: { email },
+//       data: { password: encryptedPassword },
+//     });
+
+//     return response.status(Constants.HttpStatusCodes.OK).json(
+//       Helpers.generateResponse({
+//         body: "Your password has been reset! Please log in.",
+//       })
+//     );
+//   } catch (error) {
+//     console.error(error);
+//     return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
+//       Helpers.generateErrorResponse({
+//         body: "Failed reset password. Please try again.",
+//       })
+//     );
+//   }
+// }
+
+// async function sendVerificationCode(
+//   response: Response,
+//   email: string,
+//   encryptedPassword: string
+// ) {
+//   try {
+//   } catch (error) {
+//     console.error(error);
+//     return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
+//       Helpers.generateErrorResponse({
+//         body: "Failed to send verification code. Please try again.",
+//       })
+//     );
+//   }
+// }
+
+// async function resetUserPassword(
+//   response: Response,
+//   email: string,
+//   newPassword: string
+// ) {
+//   try {
+//     const encryptedPassword = await Helpers.encryptPassword(newPassword);
+//     const { verificationCode, decodedVerificationCode } =
+//       generateAuthVerificationCodes();
+
+//     await prisma.user.update({
+//       where: { email },
+//       data: { verificationCode },
+//     });
+
+//     await Helpers.emailUser(email, "Kujira: Password Reset", [
+//       "This email is in response to your request to reset your password.",
+//       `Please copy and paste the following verification code into the app to verify your account: ${decodedVerificationCode}`,
+//       "If this is a mistake, you can safely ignore this email.",
+//     ]);
+
+//     resetPassword(response, email, encryptedPassword);
+//   } catch (error) {
+//     console.error(error);
+//     return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
+//       Helpers.generateErrorResponse({
+//         body: "An account with that email does not exist.",
+//       })
+//     );
+//   }
+// }
 
 // ========================================================================================= //
 // [ LOG OUT USER ] ======================================================================== //

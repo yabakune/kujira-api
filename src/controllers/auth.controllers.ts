@@ -121,6 +121,16 @@ export async function sendNewVerificationCode(
   }
 }
 
+export function sendPasswordResetVerificationCode(
+  request: Request<{}, {}, { email: string }>,
+  response: Response
+) {
+  return Services.sendPasswordResetVerificationCode(
+    response,
+    request.body.email
+  );
+}
+
 export async function logout(
   request: Request<{}, {}, { userId: number }>,
   response: Response

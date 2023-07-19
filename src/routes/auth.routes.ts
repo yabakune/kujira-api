@@ -59,6 +59,17 @@ authRouter.post(
   Controllers.sendNewVerificationCode
 );
 
+authRouter.post(
+  "/send-password-reset-verification-code",
+  Middleware.verifyClientPayload({ requiredData: ["email"] }),
+  Controllers.sendPasswordResetVerificationCode
+);
+
+authRouter.post(
+  "/reset-password",
+  Middleware.verifyClientPayload({ requiredData: ["email"] })
+);
+
 authRouter.patch(
   "/logout",
   Middleware.verifyClientPayload({ requiredData: ["userId"] }),
