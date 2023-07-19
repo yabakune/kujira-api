@@ -383,7 +383,7 @@ export async function resetUserPassword(
 
     return response.status(Constants.HttpStatusCodes.OK).json(
       Helpers.generateResponse({
-        body: "Your password has been reset! Please log in.",
+        body: "Your password has been reset! Please log in with your new password.",
       })
     );
   } catch (error) {
