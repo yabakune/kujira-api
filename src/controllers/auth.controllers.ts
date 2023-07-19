@@ -32,7 +32,7 @@ export async function register(
   }
 }
 
-export async function login(
+export function login(
   request: Request<{}, {}, Validators.LoginValidator>,
   response: Response
 ) {
@@ -53,7 +53,7 @@ export async function login(
   }
 }
 
-export async function verifyRegistration(
+export function verifyRegistration(
   request: Request<{}, {}, Validators.VerificationCodeValidator>,
   response: Response
 ) {
@@ -77,7 +77,7 @@ export async function verifyRegistration(
   }
 }
 
-export async function verifyLogin(
+export function verifyLogin(
   request: Request<
     {},
     {},
@@ -105,7 +105,7 @@ export async function verifyLogin(
   }
 }
 
-export async function sendNewVerificationCode(
+export function sendNewVerificationCode(
   request: Request<{}, {}, { email: string }>,
   response: Response
 ) {
@@ -146,7 +146,7 @@ export function resetUserPassword(
   );
 }
 
-export async function logout(
+export function logout(
   request: Request<{}, {}, { userId: number }>,
   response: Response
 ) {

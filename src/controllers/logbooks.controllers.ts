@@ -3,25 +3,25 @@ import { Request, Response } from "express";
 import * as Services from "@/services";
 import * as Validators from "@/validators";
 
-export async function fetchLogbooks(_: Request, response: Response) {
+export function fetchLogbooks(_: Request, response: Response) {
   return Services.fetchLogbooks(response);
 }
 
-export async function fetchLogbook(
+export function fetchLogbook(
   request: Request<{ logbookId: string }>,
   response: Response
 ) {
   return Services.fetchLogbook(response, Number(request.params.logbookId));
 }
 
-export async function fetchUserLogbooks(
+export function fetchUserLogbooks(
   request: Request<{}, {}, Validators.RequiredUserLogbooksFetchValidator>,
   response: Response
 ) {
   return Services.fetchUserLogbooks(response, request.body.ownerId);
 }
 
-export async function createLogbook(
+export function createLogbook(
   request: Request<{}, {}, Validators.RequiredLogbookCreateValidator>,
   response: Response
 ) {
@@ -32,7 +32,7 @@ export async function createLogbook(
   );
 }
 
-export async function updateLogbook(
+export function updateLogbook(
   request: Request<
     { logbookId: string },
     {},
@@ -47,7 +47,7 @@ export async function updateLogbook(
   );
 }
 
-export async function deleteLogbook(
+export function deleteLogbook(
   request: Request<{ logbookId: string }>,
   response: Response
 ) {

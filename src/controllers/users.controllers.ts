@@ -3,18 +3,18 @@ import { Request, Response } from "express";
 import * as Services from "@/services";
 import * as Validators from "@/validators";
 
-export async function fetchUsers(_: Request, response: Response) {
+export function fetchUsers(_: Request, response: Response) {
   return Services.fetchUsers(response);
 }
 
-export async function fetchUser(
+export function fetchUser(
   request: Request<{ userId: string }>,
   response: Response
 ) {
   return Services.fetchUser(response, Number(request.params.userId));
 }
 
-export async function updateUser(
+export function updateUser(
   request: Request<{ userId: string }, {}, Validators.UserUpdateValidator>,
   response: Response
 ) {
@@ -29,7 +29,7 @@ export async function updateUser(
   );
 }
 
-export async function updateUserPassword(
+export function updateUserPassword(
   request: Request<{ userId: string }, {}, Validators.UpdatePasswordValidator>,
   response: Response
 ) {
@@ -40,7 +40,7 @@ export async function updateUserPassword(
   );
 }
 
-export async function deleteUser(
+export function deleteUser(
   request: Request<{ userId: string }>,
   response: Response
 ) {

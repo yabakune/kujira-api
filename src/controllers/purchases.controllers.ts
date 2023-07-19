@@ -3,18 +3,18 @@ import { Request, Response } from "express";
 import * as Services from "@/services";
 import * as Validators from "@/validators";
 
-export async function fetchPurchases(_: Request, response: Response) {
+export function fetchPurchases(_: Request, response: Response) {
   return Services.fetchPurchases(response);
 }
 
-export async function fetchPurchase(
+export function fetchPurchase(
   request: Request<{ purchaseId: string }>,
   response: Response
 ) {
   return Services.fetchPurchase(response, Number(request.params.purchaseId));
 }
 
-export async function createPurchase(
+export function createPurchase(
   request: Request<
     {},
     {},
@@ -32,7 +32,7 @@ export async function createPurchase(
   );
 }
 
-export async function updatePurchase(
+export function updatePurchase(
   request: Request<
     { purchaseId: string },
     {},
@@ -49,21 +49,21 @@ export async function updatePurchase(
   );
 }
 
-export async function deletePurchase(
+export function deletePurchase(
   request: Request<{ purchaseId: string }>,
   response: Response
 ) {
   return Services.deletePurchase(response, Number(request.params.purchaseId));
 }
 
-export async function bulkDeletePurchases(
+export function bulkDeletePurchases(
   request: Request<{}, {}, { purchaseIds: number[] }>,
   response: Response
 ) {
   return Services.bulkDeletePurchases(response, request.body.purchaseIds);
 }
 
-export async function deleteAllEntryPurchases(
+export function deleteAllEntryPurchases(
   request: Request<{}, {}, { entryId: number }>,
   response: Response
 ) {

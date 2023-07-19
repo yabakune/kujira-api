@@ -3,25 +3,25 @@ import { Request, Response } from "express";
 import * as Services from "@/services";
 import * as Validators from "@/validators";
 
-export async function fetchOverviews(_: Request, response: Response) {
+export function fetchOverviews(_: Request, response: Response) {
   return Services.fetchOverviews(response);
 }
 
-export async function fetchOverview(
+export function fetchOverview(
   request: Request<{ overviewId: string }>,
   response: Response
 ) {
   return Services.fetchOverview(response, Number(request.params.overviewId));
 }
 
-export async function fetchLogbookOverview(
+export function fetchLogbookOverview(
   request: Request<{}, {}, { logbookId: number }>,
   response: Response
 ) {
   return Services.fetchLogbookOverview(response, request.body.logbookId);
 }
 
-export async function createOverview(
+export function createOverview(
   request: Request<{}, {}, Validators.OverviewCreateValidator>,
   response: Response
 ) {
@@ -33,7 +33,7 @@ export async function createOverview(
   );
 }
 
-export async function updateOverview(
+export function updateOverview(
   request: Request<
     { overviewId: string },
     {},
@@ -49,7 +49,7 @@ export async function updateOverview(
   );
 }
 
-export async function deleteOverview(
+export function deleteOverview(
   request: Request<{ overviewId: string }>,
   response: Response
 ) {

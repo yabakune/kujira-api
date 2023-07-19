@@ -3,32 +3,32 @@ import { Request, Response } from "express";
 import * as Services from "@/services";
 import * as Validators from "@/validators";
 
-export async function fetchEntries(_: Request, response: Response) {
+export function fetchEntries(_: Request, response: Response) {
   return Services.fetchEntries(response);
 }
 
-export async function fetchEntry(
+export function fetchEntry(
   request: Request<{ entryId: string }>,
   response: Response
 ) {
   return Services.fetchEntry(response, Number(request.params.entryId));
 }
 
-export async function fetchOverviewEntries(
+export function fetchOverviewEntries(
   request: Request<{}, {}, { overviewId: number }>,
   response: Response
 ) {
   return Services.fetchOverviewEntries(response, request.body.overviewId);
 }
 
-export async function fetchLogbookEntries(
+export function fetchLogbookEntries(
   request: Request<{}, {}, { logbookId: number }>,
   response: Response
 ) {
   return Services.fetchLogbookEntries(response, request.body.logbookId);
 }
 
-export async function createEntry(
+export function createEntry(
   request: Request<
     {},
     {},
@@ -45,7 +45,7 @@ export async function createEntry(
   );
 }
 
-export async function updateEntry(
+export function updateEntry(
   request: Request<{ entryId: string }, {}, Validators.EntryUpdateValidator>,
   response: Response
 ) {
@@ -60,7 +60,7 @@ export async function updateEntry(
   );
 }
 
-export async function deleteEntry(
+export function deleteEntry(
   request: Request<{ entryId: string }>,
   response: Response
 ) {
