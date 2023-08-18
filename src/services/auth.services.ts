@@ -1,3 +1,4 @@
+import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { Response } from "express";
 import { PrismaClient, User } from "@prisma/client";
@@ -375,18 +376,51 @@ export async function verifyPasswordResetRequest(
       data: { verificationCode: null },
     });
 
-    return response
-      .status(Constants.HttpStatusCodes.OK)
-      .json(
-        Helpers.generateResponse({
-          body: "Verified! Please enter your new password in the next step.",
-        })
-      );
+    return response.status(Constants.HttpStatusCodes.OK).json(
+      Helpers.generateResponse({
+        body: "Verified! Please enter your new password in the next step.",
+      })
+    );
   } catch (error) {
     console.error(error);
     return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
       Helpers.generateErrorResponse({
         body: "Failed to verify password reset. Please refresh the page and try again.",
+      })
+    );
+  }
+}
+
+async function checkNewPasswordIsDifferentFromOldPassword(
+  response: Response,
+  email: string,
+  oldPassword: string,
+  newPassword: string
+) {
+  try {
+    const passwordsMatch = bcrypt.compareSync(newPassword, oldPassword);
+
+    if (passwordsMatch) {
+      throw new Error();
+    } else {
+      const encryptedPassword = await Helpers.encryptPassword(newPassword);
+
+      await prisma.user.update({
+        where: { email },
+        data: { password: encryptedPassword },
+      });
+
+      return response.status(Constants.HttpStatusCodes.OK).json(
+        Helpers.generateResponse({
+          body: "Your password has been reset! Please log in with your new password.",
+        })
+      );
+    }
+  } catch (error) {
+    console.log(error);
+    return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
+      Helpers.generateErrorResponse({
+        body: "Your new password cannot be the same as your previous password.",
       })
     );
   }
@@ -398,17 +432,13 @@ export async function resetUserPassword(
   newPassword: string
 ) {
   try {
-    const encryptedPassword = await Helpers.encryptPassword(newPassword);
+    const user = await prisma.user.findUniqueOrThrow({ where: { email } });
 
-    await prisma.user.update({
-      where: { email },
-      data: { password: encryptedPassword },
-    });
-
-    return response.status(Constants.HttpStatusCodes.OK).json(
-      Helpers.generateResponse({
-        body: "Your password has been reset! Please log in with your new password.",
-      })
+    return checkNewPasswordIsDifferentFromOldPassword(
+      response,
+      email,
+      user.password,
+      newPassword
     );
   } catch (error) {
     console.error(error);
