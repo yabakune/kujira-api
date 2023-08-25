@@ -1,6 +1,6 @@
 import * as Constants from "@/constants";
 
-type Foo<Response> = {
+type Message<Response> = {
   title?: string;
   body?: string;
   caption?: string;
@@ -8,13 +8,13 @@ type Foo<Response> = {
 };
 
 export function generateResponse<Response>(
-  response: Foo<Response>
-): Foo<Response> {
+  response: Message<Response>
+): Message<Response> {
   return response;
 }
 
 export function generateErrorResponse<Response>(
-  response: Foo<Response>
-): Foo<Response> {
+  response: Message<Response>
+): Message<Response> {
   return { ...response, caption: Constants.Errors.CONTACT_EMAIL };
 }

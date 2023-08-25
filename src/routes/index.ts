@@ -1,4 +1,5 @@
 export * from "./auth.routes";
+export * from "./onboarding.routes";
 export * from "./users.routes";
 export * from "./overviews.routes";
 export * from "./logbooks.routes";
