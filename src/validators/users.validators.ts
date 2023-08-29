@@ -7,6 +7,7 @@ const userUpdateValidator = Prisma.validator<Prisma.UserArgs>()({
     currency: true,
     theme: true,
     mobileNumber: true,
+    onboarded: true,
   },
 });
 export type UserUpdateValidator = Partial<

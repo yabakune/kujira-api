@@ -16,6 +16,7 @@ const optionalUserUpdateData: Validators.OptionalUserUpdateData = [
   "currency",
   "theme",
   "mobileNumber",
+  "onboarded",
 ];
 usersRouter.patch(
   "/:userId",

@@ -25,7 +25,8 @@ export function updateUser(
     request.body.username,
     request.body.currency,
     request.body.theme,
-    request.body.mobileNumber
+    request.body.mobileNumber,
+    request.body.onboarded
   );
 }
 

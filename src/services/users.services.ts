@@ -77,7 +77,8 @@ export async function updateUser(
   username?: string,
   currency?: Currency,
   theme?: Theme,
-  mobileNumber?: string | null
+  mobileNumber?: string | null,
+  onboarded?: boolean
 ) {
   try {
     const data: Validators.UserUpdateValidator = {
@@ -86,6 +87,7 @@ export async function updateUser(
       currency,
       theme,
       mobileNumber,
+      onboarded,
     };
 
     const updatedUser = await prisma.user.update({
