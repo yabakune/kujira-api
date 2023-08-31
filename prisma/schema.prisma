@@ -11,8 +11,8 @@ datasource db {
 }
 
 enum Theme {
-  dark
-  light
+  violet
+  lilac
   system
   auto
 }
@@ -27,7 +27,7 @@ model User {
   username         String      @unique @db.VarChar(16)
   password         String
   currency         Currency    @default(USD)
-  theme            Theme       @default(dark)
+  theme            Theme       @default(violet)
   mobileNumber     String?
   accessToken      String?
   verificationCode String?
