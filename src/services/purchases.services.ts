@@ -75,7 +75,7 @@ export async function fetchEntryPurchases(response: Response, entryId: number) {
 
 export async function createPurchase(
   response: Response,
-  category: Category,
+  category: Category | null,
   entryId: number,
   description?: string,
   cost?: number | null
@@ -109,7 +109,7 @@ export async function createPurchase(
 export async function updatePurchase(
   response: Response,
   purchaseId: number,
-  category?: Category,
+  category?: Category | null,
   description?: string,
   cost?: number | null
 ) {
