@@ -36,7 +36,6 @@ app.use(express.json()); // Allows API to parse client payload.
 // ↓↓↓ Routes ↓↓↓
 enum RouteBases {
   AUTH = "/api/v1/auth",
-  ONBOARDING = "/api/v1/onboarding",
   USERS = "/api/v1/users",
   OVERVIEWS = "/api/v1/overviews",
   LOGBOOKS = "/api/v1/logbooks",
@@ -46,11 +45,6 @@ enum RouteBases {
 }
 if (process.env.NODE_ENV === "production") {
   app.use(RouteBases.AUTH, Routes.authRouter);
-  app.use(
-    RouteBases.ONBOARDING,
-    validateAuthorizedUser,
-    Routes.onboardingRouter
-  );
   app.use(RouteBases.USERS, validateAuthorizedUser, Routes.usersRouter);
   app.use(RouteBases.OVERVIEWS, validateAuthorizedUser, Routes.overviewsRouter);
   app.use(RouteBases.LOGBOOKS, validateAuthorizedUser, Routes.logbooksRouter);
@@ -58,7 +52,6 @@ if (process.env.NODE_ENV === "production") {
   app.use(RouteBases.PURCHASES, validateAuthorizedUser, Routes.purchasesRouter);
 } else {
   app.use(RouteBases.AUTH, Routes.authRouter);
-  app.use(RouteBases.ONBOARDING, Routes.onboardingRouter);
   app.use(RouteBases.USERS, Routes.usersRouter);
   app.use(RouteBases.OVERVIEWS, Routes.overviewsRouter);
   app.use(RouteBases.LOGBOOKS, Routes.logbooksRouter);
