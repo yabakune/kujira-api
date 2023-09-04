@@ -55,7 +55,10 @@ export async function fetchPurchase(response: Response, purchaseId: number) {
 
 export async function fetchEntryPurchases(response: Response, entryId: number) {
   try {
-    const purchases = await prisma.purchase.findMany({ where: { entryId } });
+    const purchases = await prisma.purchase.findMany({
+      where: { entryId },
+      orderBy: { placement: "asc" },
+    });
 
     return response.status(Constants.HttpStatusCodes.OK).json(
       Helpers.generateResponse({
