@@ -70,9 +70,9 @@ export function bulkDeletePurchases(
   return Services.bulkDeletePurchases(response, request.body.purchaseIds);
 }
 
-export function deleteAllEntryPurchases(
+export function deleteEntryPurchases(
   request: Request<{}, {}, { entryId: number }>,
   response: Response
 ) {
-  return Services.deleteAllEntryPurchases(response, request.body.entryId);
+  return Services.deleteEntryPurchases(response, request.body.entryId);
 }

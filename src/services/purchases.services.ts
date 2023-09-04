@@ -191,7 +191,7 @@ export async function bulkDeletePurchases(
   }
 }
 
-export async function deleteAllEntryPurchases(
+export async function deleteEntryPurchases(
   response: Response,
   entryId: number
 ) {

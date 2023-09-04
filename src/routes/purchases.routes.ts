@@ -57,13 +57,13 @@ purchasesRouter.delete(
   Controllers.bulkDeletePurchases
 );
 
-const requiredDeleteAllEntryPurchasesData = ["entryId"];
+const requiredDeleteEntryPurchasesData = ["entryId"];
 purchasesRouter.delete(
-  "/delete-all-entry-purchases",
+  "/delete-entry-purchases",
   Middleware.verifyClientPayload({
-    requiredData: requiredDeleteAllEntryPurchasesData,
+    requiredData: requiredDeleteEntryPurchasesData,
   }),
-  Controllers.deleteAllEntryPurchases
+  Controllers.deleteEntryPurchases
 );
 
 purchasesRouter.delete("/:purchaseId", Controllers.deletePurchase);
