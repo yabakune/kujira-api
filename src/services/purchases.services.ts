@@ -53,6 +53,26 @@ export async function fetchPurchase(response: Response, purchaseId: number) {
   }
 }
 
+export async function fetchEntryPurchases(response: Response, entryId: number) {
+  try {
+    const purchases = await prisma.purchase.findMany({ where: { entryId } });
+
+    return response.status(Constants.HttpStatusCodes.OK).json(
+      Helpers.generateResponse({
+        body: "Fetched purchases!",
+        response: purchases,
+      })
+    );
+  } catch (error) {
+    console.error(error);
+    return response.status(Constants.HttpStatusCodes.NOT_FOUND).json(
+      Helpers.generateErrorResponse({
+        body: "There was an error fetching entry purchases. Chances are, the entry does not exist. Please refresh the page and try again.",
+      })
+    );
+  }
+}
+
 export async function createPurchase(
   response: Response,
   category: Category,

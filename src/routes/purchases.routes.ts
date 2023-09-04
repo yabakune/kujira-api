@@ -10,6 +10,16 @@ purchasesRouter.get("/", Controllers.fetchPurchases);
 
 purchasesRouter.get("/:purchaseId", Controllers.fetchPurchase);
 
+const requiredFetchEntryPurchasesData: Validators.RequiredFetchEntryPurchasesData =
+  ["entryId"];
+purchasesRouter.post(
+  "/fetch-entry-purchases",
+  Middleware.verifyClientPayload({
+    requiredData: requiredFetchEntryPurchasesData,
+  }),
+  Controllers.fetchEntryPurchases
+);
+
 const requiredPurchaseCreateData: Validators.RequiredPurchaseCreateData = [
   "category",
   "entryId",

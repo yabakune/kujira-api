@@ -1,5 +1,15 @@
 import { Prisma } from "@prisma/client";
 
+const requiredFetchEntryPurchaseValidator =
+  Prisma.validator<Prisma.PurchaseArgs>()({
+    select: { entryId: true },
+  });
+export type RequiredFetchEntryPurchasesValidator = Prisma.PurchaseGetPayload<
+  typeof requiredFetchEntryPurchaseValidator
+>;
+export type RequiredFetchEntryPurchasesData =
+  (keyof RequiredFetchEntryPurchasesValidator)[];
+
 const requiredPurchaseCreateValidator = Prisma.validator<Prisma.PurchaseArgs>()(
   {
     select: {

@@ -14,6 +14,13 @@ export function fetchPurchase(
   return Services.fetchPurchase(response, Number(request.params.purchaseId));
 }
 
+export function fetchEntryPurchases(
+  request: Request<{}, {}, Validators.RequiredFetchEntryPurchasesValidator>,
+  response: Response
+) {
+  return Services.fetchEntryPurchases(response, request.body.entryId);
+}
+
 export function createPurchase(
   request: Request<
     {},
