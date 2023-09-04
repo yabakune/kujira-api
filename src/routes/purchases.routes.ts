@@ -49,7 +49,7 @@ purchasesRouter.patch(
 );
 
 const requiredBulkDeletePurchasesData = ["purchaseIds"];
-purchasesRouter.delete(
+purchasesRouter.post(
   "/bulk-delete-purchases",
   Middleware.verifyClientPayload({
     requiredData: requiredBulkDeletePurchasesData,
@@ -58,7 +58,7 @@ purchasesRouter.delete(
 );
 
 const requiredDeleteEntryPurchasesData = ["entryId"];
-purchasesRouter.delete(
+purchasesRouter.post(
   "/delete-entry-purchases",
   Middleware.verifyClientPayload({
     requiredData: requiredDeleteEntryPurchasesData,
