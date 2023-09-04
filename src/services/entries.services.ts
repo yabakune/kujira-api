@@ -106,6 +106,33 @@ export async function fetchLogbookEntries(
   }
 }
 
+async function checkExistingEntry(
+  response: Response,
+  name: string,
+  overviewId?: number | null,
+  logbookId?: number | null
+) {
+  try {
+    let entry = null;
+
+    if (overviewId) {
+      entry = await prisma.entry.findFirst({ where: { name, overviewId } });
+    } else if (logbookId) {
+      entry = await prisma.entry.findFirst({ where: { name, logbookId } });
+    }
+
+    if (entry) throw new Error();
+    else return;
+  } catch (error) {
+    console.error(error);
+    return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
+      Helpers.generateErrorResponse({
+        body: `An entry with name "${name}" already exists!`,
+      })
+    );
+  }
+}
+
 export async function createEntry(
   response: Response,
   name: string,
@@ -113,6 +140,8 @@ export async function createEntry(
   logbookId?: number | null
 ) {
   try {
+    await checkExistingEntry(response, name, overviewId, logbookId);
+
     const data: Validators.RequiredEntryCreateValidator &
       Validators.OptionalEntryCreateValidator = {
       name,

@@ -147,6 +147,42 @@ function formatDateToName(): string {
   return `${month} ${year}`;
 }
 
+async function initializeDashboard(response: Response, ownerId: number) {
+  try {
+    const { id: logbookId } = await prisma.logbook.create({
+      data: { name: formatDateToName(), ownerId },
+    });
+
+    const { id: overviewId } = await prisma.overview.create({
+      data: { income: 0, logbookId },
+    });
+
+    const { id: recurringEntryId } = await prisma.entry.create({
+      data: { name: "Recurring", overviewId },
+    });
+    await prisma.purchase.create({
+      data: { placement: 1, entryId: recurringEntryId },
+    });
+
+    const { id: incomingEntryId } = await prisma.entry.create({
+      data: { name: "Incoming", overviewId },
+    });
+    await prisma.purchase.create({
+      data: { placement: 1, entryId: incomingEntryId },
+    });
+
+    // Just exit this function and move onto the next step if everything's 👍
+    return;
+  } catch (error) {
+    console.error(error);
+    return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
+      Helpers.generateErrorResponse({
+        body: "Failed to initialize account. Please try again.",
+      })
+    );
+  }
+}
+
 async function verifyRegistration(
   response: Response,
   user: User,
@@ -158,27 +194,7 @@ async function verifyRegistration(
       data: { accessToken, verificationCode: null, emailVerified: true },
     });
 
-    const { id: logbookId } = await prisma.logbook.create({
-      data: {
-        name: formatDateToName(),
-        ownerId: userId,
-      },
-    });
-
-    const { id: overviewId } = await prisma.overview.create({
-      data: { income: 0, logbookId },
-    });
-
-    await prisma.entry.createMany({
-      data: [
-        { name: "Recurring", overviewId },
-        { name: "Incoming", overviewId },
-      ],
-      skipDuplicates: true,
-    });
-
-    // Just exit this function and move onto the next step if everything's 👍
-    return;
+    return initializeDashboard(response, userId);
   } catch (error) {
     console.error(error);
     return response
