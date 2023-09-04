@@ -106,15 +106,15 @@ enum Category {
 }
 
 model Purchase {
-  id          Int      @id @default(autoincrement())
-  placement   Int      @default(0)
-  category    Category
-  description String   @default("")
+  id          Int       @id @default(autoincrement())
+  placement   Int       @default(0)
+  category    Category?
+  description String    @default("")
   cost        Float?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
   // Belongs To
-  entry       Entry    @relation(fields: [entryId], references: [id], onDelete: Cascade)
+  entry       Entry     @relation(fields: [entryId], references: [id], onDelete: Cascade)
   entryId     Int
 }
 
