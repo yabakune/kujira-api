@@ -111,12 +111,14 @@ export async function createPurchase(
 export async function updatePurchase(
   response: Response,
   purchaseId: number,
+  placement?: number,
   category?: Category | null,
   description?: string,
   cost?: number | null
 ) {
   try {
     const data: Validators.OptionalPurchaseUpdateValidator = {
+      placement,
       category,
       description,
       cost,

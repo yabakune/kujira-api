@@ -51,6 +51,7 @@ export function updatePurchase(
   return Services.updatePurchase(
     response,
     Number(request.params.purchaseId),
+    request.body.placement,
     request.body.category,
     request.body.description,
     request.body.cost

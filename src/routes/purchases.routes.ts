@@ -39,6 +39,7 @@ purchasesRouter.post(
 );
 
 const optionalPurchaseUpdateData: Validators.OptionalPurchaseUpdateData = [
+  "placement",
   "category",
   "cost",
   "description",

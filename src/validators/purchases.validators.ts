@@ -38,6 +38,7 @@ export type OptionalPurchaseCreateData =
 const optionalPurchaseUpdateValidator = Prisma.validator<Prisma.PurchaseArgs>()(
   {
     select: {
+      placement: true,
       category: true,
       description: true,
       cost: true,
