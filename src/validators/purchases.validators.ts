@@ -13,7 +13,7 @@ export type RequiredFetchEntryPurchasesData =
 const requiredPurchaseCreateValidator = Prisma.validator<Prisma.PurchaseArgs>()(
   {
     select: {
-      category: true,
+      placement: true,
       entryId: true,
     },
   }
@@ -26,7 +26,7 @@ export type RequiredPurchaseCreateData =
 
 const optionalPurchaseCreateValidator = Prisma.validator<Prisma.PurchaseArgs>()(
   {
-    select: { description: true, cost: true },
+    select: { category: true, description: true, cost: true },
   }
 );
 export type OptionalPurchaseCreateValidator = Partial<

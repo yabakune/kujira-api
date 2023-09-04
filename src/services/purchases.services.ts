@@ -75,14 +75,16 @@ export async function fetchEntryPurchases(response: Response, entryId: number) {
 
 export async function createPurchase(
   response: Response,
-  category: Category | null,
+  placement: number,
   entryId: number,
+  category?: Category | null,
   description?: string,
   cost?: number | null
 ) {
   try {
     const data: Validators.RequiredPurchaseCreateValidator &
       Validators.OptionalPurchaseCreateValidator = {
+      placement,
       category,
       entryId,
       description,

@@ -21,10 +21,11 @@ purchasesRouter.post(
 );
 
 const requiredPurchaseCreateData: Validators.RequiredPurchaseCreateData = [
-  "category",
+  "placement",
   "entryId",
 ];
 const optionalPurchaseCreateData: Validators.OptionalPurchaseCreateData = [
+  "category",
   "cost",
   "description",
 ];
