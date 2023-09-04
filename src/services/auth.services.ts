@@ -44,6 +44,69 @@ function generateAuthVerificationCodes() {
   }
 }
 
+const months: { [key: string]: string } = {
+  0: "January",
+  1: "February",
+  2: "March",
+  3: "April",
+  4: "May",
+  5: "June",
+  6: "July",
+  7: "August",
+  8: "September",
+  9: "October",
+  10: "November",
+  11: "December",
+};
+
+function formatDateToName(): string {
+  const today = new Date();
+  const month = months[today.getMonth()];
+  const year = today.getFullYear();
+  return `${month} ${year}`;
+}
+
+async function initializeDashboard(response: Response, ownerId: number) {
+  try {
+    const { id: logbookId } = await prisma.logbook.create({
+      data: { name: formatDateToName(), ownerId },
+    });
+
+    const { id: overviewId } = await prisma.overview.create({
+      data: { income: 0, logbookId },
+    });
+
+    const { id: recurringEntryId } = await prisma.entry.create({
+      data: { name: "Recurring", overviewId },
+    });
+    await prisma.purchase.create({
+      data: { placement: 1, entryId: recurringEntryId },
+    });
+
+    const { id: incomingEntryId } = await prisma.entry.create({
+      data: { name: "Incoming", overviewId },
+    });
+    await prisma.purchase.create({
+      data: { placement: 1, entryId: incomingEntryId },
+    });
+
+    return response.status(Constants.HttpStatusCodes.CREATED).json(
+      Helpers.generateResponse({
+        title: "Verify Registration",
+        body: "A verification code was sent to your email. Please enter it below.",
+        caption: "Note that your code will expire within 5 minutes.",
+      })
+    );
+  } catch (error) {
+    console.error(error);
+    return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
+      Helpers.generateErrorResponse({
+        body: "Failed to initialize account. Please try again.",
+      })
+    );
+  }
+}
+
 export async function registerNewUserAndEmailVerificationCode(
   response: Response,
   email: string,
@@ -60,7 +123,7 @@ export async function registerNewUserAndEmailVerificationCode(
       password,
       verificationCode,
     };
-    await prisma.user.create({ data });
+    const { id: newUserId } = await prisma.user.create({ data });
 
     await Helpers.emailUser(email, "Kujira: Confirm Registration", [
       "Thank you for registering! Glad to have you on board :)",
@@ -68,13 +131,7 @@ export async function registerNewUserAndEmailVerificationCode(
       "If this is a mistake, you can safely ignore this email.",
     ]);
 
-    return response.status(Constants.HttpStatusCodes.CREATED).json(
-      Helpers.generateResponse({
-        title: "Verify Registration",
-        body: "A verification code was sent to your email. Please enter it below.",
-        caption: "Note that your code will expire within 5 minutes.",
-      })
-    );
+    return initializeDashboard(response, newUserId);
   } catch (error) {
     console.error(error);
     return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
@@ -125,76 +182,18 @@ export async function loginUserAndEmailVerificationCode(
 // [ VERIFYING USER REGISTRATION / LOGIN ] ================================================= //
 // ========================================================================================= //
 
-const months: { [key: string]: string } = {
-  0: "January",
-  1: "February",
-  2: "March",
-  3: "April",
-  4: "May",
-  5: "June",
-  6: "July",
-  7: "August",
-  8: "September",
-  9: "October",
-  10: "November",
-  11: "December",
-};
-
-function formatDateToName(): string {
-  const today = new Date();
-  const month = months[today.getMonth()];
-  const year = today.getFullYear();
-  return `${month} ${year}`;
-}
-
-async function initializeDashboard(response: Response, ownerId: number) {
-  try {
-    const { id: logbookId } = await prisma.logbook.create({
-      data: { name: formatDateToName(), ownerId },
-    });
-
-    const { id: overviewId } = await prisma.overview.create({
-      data: { income: 0, logbookId },
-    });
-
-    const { id: recurringEntryId } = await prisma.entry.create({
-      data: { name: "Recurring", overviewId },
-    });
-    await prisma.purchase.create({
-      data: { placement: 1, entryId: recurringEntryId },
-    });
-
-    const { id: incomingEntryId } = await prisma.entry.create({
-      data: { name: "Incoming", overviewId },
-    });
-    await prisma.purchase.create({
-      data: { placement: 1, entryId: incomingEntryId },
-    });
-
-    // Just exit this function and move onto the next step if everything's 👍
-    return;
-  } catch (error) {
-    console.error(error);
-    return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
-      Helpers.generateErrorResponse({
-        body: "Failed to initialize account. Please try again.",
-      })
-    );
-  }
-}
-
 async function verifyRegistration(
   response: Response,
   user: User,
   accessToken: string
 ) {
   try {
-    const { id: userId } = await prisma.user.update({
+    await prisma.user.update({
       where: { email: user.email },
       data: { accessToken, verificationCode: null, emailVerified: true },
     });
-
-    return initializeDashboard(response, userId);
+    // Just exit this function and move onto the next step if everything's 👍
+    return;
   } catch (error) {
     console.error(error);
     return response
