@@ -21,7 +21,6 @@ purchasesRouter.post(
 );
 
 const requiredPurchaseCreateData: Validators.RequiredPurchaseCreateData = [
-  "placement",
   "entryId",
 ];
 const optionalPurchaseCreateData: Validators.OptionalPurchaseCreateData = [

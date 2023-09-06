@@ -78,16 +78,26 @@ export async function fetchEntryPurchases(response: Response, entryId: number) {
 
 export async function createPurchase(
   response: Response,
-  placement: number,
   entryId: number,
   category?: Category | null,
   description?: string,
   cost?: number | null
 ) {
   try {
+    const { purchases } = await prisma.entry.findUniqueOrThrow({
+      where: { id: entryId },
+      include: {
+        purchases: {
+          take: 1,
+          orderBy: { placement: "desc" },
+          select: { placement: true },
+        },
+      },
+    });
+
     const data: Validators.RequiredPurchaseCreateValidator &
       Validators.OptionalPurchaseCreateValidator = {
-      placement,
+      placement: purchases[0].placement + 1,
       category,
       entryId,
       description,

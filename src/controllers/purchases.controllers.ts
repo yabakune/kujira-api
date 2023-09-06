@@ -32,7 +32,6 @@ export function createPurchase(
 ) {
   return Services.createPurchase(
     response,
-    request.body.placement,
     request.body.entryId,
     request.body.category,
     request.body.description,
