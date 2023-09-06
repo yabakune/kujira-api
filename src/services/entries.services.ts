@@ -57,6 +57,12 @@ export async function fetchOverviewEntries(
   try {
     const overviewEntries = await prisma.entry.findMany({
       where: { overviewId },
+      include: {
+        purchases: {
+          select: { id: true },
+          orderBy: { placement: "asc" },
+        },
+      },
     });
 
     return response.status(Constants.HttpStatusCodes.OK).json(
@@ -84,6 +90,12 @@ export async function fetchLogbookEntries(
   try {
     const logbookEntries = await prisma.entry.findMany({
       where: { logbookId },
+      include: {
+        purchases: {
+          select: { id: true },
+          orderBy: { placement: "asc" },
+        },
+      },
     });
 
     return response.status(Constants.HttpStatusCodes.OK).json(
