@@ -97,7 +97,7 @@ export async function createPurchase(
 
     const data: Validators.RequiredPurchaseCreateValidator &
       Validators.OptionalPurchaseCreateValidator = {
-      placement: purchases[0].placement + 1,
+      placement: purchases.length > 0 ? purchases[0].placement + 1 : 1,
       category,
       entryId,
       description,
@@ -115,7 +115,7 @@ export async function createPurchase(
     console.error(error);
     return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
       Helpers.generateErrorResponse({
-        body: "Failed to create purchase." + Constants.Errors.CREATE_ERROR,
+        body: "Failed to create purchase. " + Constants.Errors.CREATE_ERROR,
       })
     );
   }

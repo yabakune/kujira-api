@@ -10,8 +10,9 @@ import dotenv from "dotenv";
 import helmet from "helmet";
 // import { rateLimit } from "express-rate-limit";
 
+import * as Constants from "@/constants";
 import * as Routes from "@/routes";
-import { generateResponse } from "./helpers";
+// import { generateResponse } from "./helpers";
 import { validateAuthorizedUser } from "./middleware";
 
 dotenv.config();
@@ -68,7 +69,10 @@ const errorFallbackMiddleware: ErrorRequestHandler = (
 ) => {
   if (error) {
     console.error(error);
-    response.json(generateResponse({ body: error.message }));
+    response.status(Constants.HttpStatusCodes.NOT_FOUND).json({
+      body: error.message,
+    });
+    // response.json(generateResponse({ body: error.message }));
   }
 };
 app.use(errorFallbackMiddleware);

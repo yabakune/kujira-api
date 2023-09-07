@@ -177,6 +177,10 @@ export async function createEntry(
         },
       });
 
+      await prisma.purchase.create({
+        data: { entryId: entry.id },
+      });
+
       return response
         .status(Constants.HttpStatusCodes.CREATED)
         .json(
@@ -203,30 +207,46 @@ export async function updateEntry(
   logbookId?: number | null
 ) {
   try {
-    const data: Validators.EntryUpdateValidator = {
-      name,
-      totalSpent,
-      budget,
-      overviewId,
-      logbookId,
-    };
+    let entryAlreadyExists = false;
 
-    const entry = await prisma.entry.update({
-      data,
-      where: { id: entryId },
-      include: {
-        purchases: {
-          select: { id: true },
-          orderBy: { placement: "asc" },
-        },
-      },
-    });
-
-    return response
-      .status(Constants.HttpStatusCodes.OK)
-      .json(
-        Helpers.generateResponse({ body: "Updated entry!", response: entry })
+    if (name) {
+      const entryCheck = await checkExistingEntry(
+        response,
+        name,
+        overviewId,
+        logbookId
       );
+      if (entryCheck) entryAlreadyExists = true;
+    }
+
+    if (entryAlreadyExists) {
+      throw new Error(`An entry with name "${name}" already exists!`);
+    } else {
+      const data: Validators.EntryUpdateValidator = {
+        name,
+        totalSpent,
+        budget,
+        overviewId,
+        logbookId,
+      };
+
+      const entry = await prisma.entry.update({
+        data,
+        where: { id: entryId },
+        include: {
+          purchases: {
+            select: { id: true },
+            orderBy: { placement: "asc" },
+          },
+        },
+      });
+
+      return response
+        .status(Constants.HttpStatusCodes.OK)
+        .json(
+          Helpers.generateResponse({ body: "Updated entry!", response: entry })
+        );
+    }
   } catch (error) {
     console.error(error);
     return response.status(Constants.HttpStatusCodes.NOT_FOUND).json({
