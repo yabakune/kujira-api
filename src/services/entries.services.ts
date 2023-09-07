@@ -159,7 +159,15 @@ export async function createEntry(
       logbookId,
     };
 
-    const entry = await prisma.entry.create({ data });
+    const entry = await prisma.entry.create({
+      data,
+      include: {
+        purchases: {
+          select: { id: true },
+          orderBy: { placement: "asc" },
+        },
+      },
+    });
 
     return response
       .status(Constants.HttpStatusCodes.CREATED)
@@ -194,7 +202,16 @@ export async function updateEntry(
       logbookId,
     };
 
-    const entry = await prisma.entry.update({ where: { id: entryId }, data });
+    const entry = await prisma.entry.update({
+      data,
+      where: { id: entryId },
+      include: {
+        purchases: {
+          select: { id: true },
+          orderBy: { placement: "asc" },
+        },
+      },
+    });
 
     return response
       .status(Constants.HttpStatusCodes.OK)
