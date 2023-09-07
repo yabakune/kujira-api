@@ -88,7 +88,10 @@ export async function createOverview(
       logbookId,
     };
 
-    const overview = await prisma.overview.create({ data });
+    const overview = await prisma.overview.create({
+      data,
+      include: { entries: { select: { id: true } } },
+    });
 
     return response.status(Constants.HttpStatusCodes.CREATED).json(
       Helpers.generateResponse({
@@ -117,8 +120,9 @@ export async function updateOverview(
     };
 
     const updatedOverview = await prisma.overview.update({
-      where: { id: overviewId },
       data,
+      where: { id: overviewId },
+      include: { entries: { select: { id: true } } },
     });
 
     return response.status(Constants.HttpStatusCodes.OK).json(
