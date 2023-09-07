@@ -131,13 +131,13 @@ async function checkExistingEntry(
       entry = await prisma.entry.findFirst({ where: { name, logbookId } });
     }
 
-    if (entry) throw new Error();
-    else return;
+    if (entry) return true;
+    else return false;
   } catch (error) {
     console.error(error);
     return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
       Helpers.generateErrorResponse({
-        body: `An entry with name "${name}" already exists!`,
+        body: "Failed to check for an existing entry during entry creation.",
       })
     );
   }
@@ -150,35 +150,44 @@ export async function createEntry(
   logbookId?: number | null
 ) {
   try {
-    await checkExistingEntry(response, name, overviewId, logbookId);
-
-    const data: Validators.RequiredEntryCreateValidator &
-      Validators.OptionalEntryCreateValidator = {
+    const entryAlreadyExists = await checkExistingEntry(
+      response,
       name,
       overviewId,
-      logbookId,
-    };
+      logbookId
+    );
 
-    const entry = await prisma.entry.create({
-      data,
-      include: {
-        purchases: {
-          select: { id: true },
-          orderBy: { placement: "asc" },
+    if (entryAlreadyExists) {
+      throw new Error();
+    } else {
+      const data: Validators.RequiredEntryCreateValidator &
+        Validators.OptionalEntryCreateValidator = {
+        name,
+        overviewId,
+        logbookId,
+      };
+
+      const entry = await prisma.entry.create({
+        data,
+        include: {
+          purchases: {
+            select: { id: true },
+            orderBy: { placement: "asc" },
+          },
         },
-      },
-    });
+      });
 
-    return response
-      .status(Constants.HttpStatusCodes.CREATED)
-      .json(
-        Helpers.generateResponse({ body: "Created entry!", response: entry })
-      );
+      return response
+        .status(Constants.HttpStatusCodes.CREATED)
+        .json(
+          Helpers.generateResponse({ body: "Created entry!", response: entry })
+        );
+    }
   } catch (error) {
     console.error(error);
     return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
       Helpers.generateErrorResponse({
-        body: "Failed to create entry." + Constants.Errors.CREATE_ERROR,
+        body: `An entry with name "${name}" already exists!`,
       })
     );
   }
