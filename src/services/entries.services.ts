@@ -90,6 +90,7 @@ export async function fetchLogbookEntries(
   try {
     const logbookEntries = await prisma.entry.findMany({
       where: { logbookId },
+      orderBy: { name: "desc" },
       include: {
         purchases: {
           select: { id: true },
