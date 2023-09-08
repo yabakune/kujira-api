@@ -57,7 +57,7 @@ export async function fetchUserLogbooks(response: Response, ownerId: number) {
       where: { ownerId },
       include: {
         overview: { select: { id: true } },
-        entries: { select: { id: true } },
+        entries: { select: { id: true }, orderBy: { name: "desc" } },
       },
     });
 
