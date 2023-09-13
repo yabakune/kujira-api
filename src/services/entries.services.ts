@@ -116,32 +116,6 @@ export async function fetchLogbookEntries(
   }
 }
 
-async function checkExistingEntry(
-  response: Response,
-  name: string,
-  overviewId?: number | null,
-  logbookId?: number | null
-) {
-  try {
-    let entry = null;
-
-    if (overviewId) {
-      entry = await prisma.entry.findFirst({ where: { name, overviewId } });
-    } else if (logbookId) {
-      entry = await prisma.entry.findFirst({ where: { name, logbookId } });
-    }
-
-    return !!entry;
-  } catch (error) {
-    console.error(error);
-    return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
-      Helpers.generateErrorResponse({
-        body: "Failed to check for an existing entry during entry creation.",
-      })
-    );
-  }
-}
-
 export async function createEntry(
   response: Response,
   name: string,
@@ -149,48 +123,37 @@ export async function createEntry(
   logbookId?: number | null
 ) {
   try {
-    const entryAlreadyExists = await checkExistingEntry(
-      response,
+    const data: Validators.RequiredEntryCreateValidator &
+      Validators.OptionalEntryCreateValidator = {
       name,
       overviewId,
-      logbookId
-    );
+      logbookId,
+    };
 
-    if (entryAlreadyExists) {
-      throw new Error();
-    } else {
-      const data: Validators.RequiredEntryCreateValidator &
-        Validators.OptionalEntryCreateValidator = {
-        name,
-        overviewId,
-        logbookId,
-      };
-
-      const entry = await prisma.entry.create({
-        data,
-        include: {
-          purchases: {
-            select: { id: true },
-            orderBy: { placement: "asc" },
-          },
+    const entry = await prisma.entry.create({
+      data,
+      include: {
+        purchases: {
+          select: { id: true },
+          orderBy: { placement: "asc" },
         },
-      });
+      },
+    });
 
-      await prisma.purchase.create({
-        data: { entryId: entry.id },
-      });
+    await prisma.purchase.create({
+      data: { entryId: entry.id },
+    });
 
-      return response
-        .status(Constants.HttpStatusCodes.CREATED)
-        .json(
-          Helpers.generateResponse({ body: "Created entry!", response: entry })
-        );
-    }
+    return response
+      .status(Constants.HttpStatusCodes.CREATED)
+      .json(
+        Helpers.generateResponse({ body: "Created entry!", response: entry })
+      );
   } catch (error) {
     console.error(error);
     return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
       Helpers.generateErrorResponse({
-        body: `An entry with name "${name}" already exists!`,
+        body: "There was an error with creating your entry. Please refresh the page and try again.",
       })
     );
   }
@@ -206,17 +169,6 @@ export async function updateEntry(
   logbookId?: number | null
 ) {
   try {
-    if (name) {
-      const entryAlreadyExists = await checkExistingEntry(
-        response,
-        name,
-        overviewId,
-        logbookId
-      );
-      if (entryAlreadyExists) throw new Error();
-    }
-
-    // ↓↓↓ This part won't execute if the entry's name is updated to one that already exists. ↓↓↓ //
     const data: Validators.EntryUpdateValidator = {
       name,
       totalSpent,
@@ -245,7 +197,7 @@ export async function updateEntry(
   } catch (error) {
     console.error(error);
     return response.status(Constants.HttpStatusCodes.NOT_FOUND).json({
-      body: `An entry with the name ${name} already exists.`,
+      body: "There was an error with updating your entry. Please refresh the page and try again.",
     });
   }
 }

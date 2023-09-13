@@ -37,6 +37,7 @@ entriesRouter.post(
     requiredData: requiredEntryCreateData,
     optionalData: optionalEntryCreateData,
   }),
+  Middleware.checkIfEntryWithNameAlreadyExists,
   Controllers.createEntry
 );
 
@@ -50,6 +51,7 @@ const optionalEntryUpdateData: Validators.OptionalEntryUpdateData = [
 entriesRouter.patch(
   "/:entryId",
   Middleware.verifyClientPayload({ optionalData: optionalEntryUpdateData }),
+  Middleware.checkIfEntryWithNameAlreadyExists,
   Controllers.updateEntry
 );
 
