@@ -131,8 +131,7 @@ async function checkExistingEntry(
       entry = await prisma.entry.findFirst({ where: { name, logbookId } });
     }
 
-    if (entry) return true;
-    else return false;
+    return !!entry;
   } catch (error) {
     console.error(error);
     return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
@@ -207,50 +206,46 @@ export async function updateEntry(
   logbookId?: number | null
 ) {
   try {
-    let entryAlreadyExists = false;
-
     if (name) {
-      const entryCheck = await checkExistingEntry(
+      const entryAlreadyExists = await checkExistingEntry(
         response,
         name,
         overviewId,
         logbookId
       );
-      if (entryCheck) entryAlreadyExists = true;
+      if (entryAlreadyExists) throw new Error();
     }
 
-    if (entryAlreadyExists) {
-      throw new Error(`An entry with name "${name}" already exists!`);
-    } else {
-      const data: Validators.EntryUpdateValidator = {
-        name,
-        totalSpent,
-        budget,
-        overviewId,
-        logbookId,
-      };
+    // ↓↓↓ This part won't execute if the entry's name is updated to one that already exists. ↓↓↓ //
+    const data: Validators.EntryUpdateValidator = {
+      name,
+      totalSpent,
+      budget,
+      overviewId,
+      logbookId,
+    };
 
-      const entry = await prisma.entry.update({
-        data,
-        where: { id: entryId },
-        include: {
-          purchases: {
-            select: { id: true },
-            orderBy: { placement: "asc" },
-          },
+    const entry = await prisma.entry.update({
+      data,
+      where: { id: entryId },
+      include: {
+        purchases: {
+          select: { id: true },
+          orderBy: { placement: "asc" },
         },
-      });
+      },
+    });
 
-      return response
-        .status(Constants.HttpStatusCodes.OK)
-        .json(
-          Helpers.generateResponse({ body: "Updated entry!", response: entry })
-        );
-    }
+    return response.status(Constants.HttpStatusCodes.OK).json(
+      Helpers.generateResponse({
+        body: "Updated entry!",
+        response: entry,
+      })
+    );
   } catch (error) {
     console.error(error);
     return response.status(Constants.HttpStatusCodes.NOT_FOUND).json({
-      body: Constants.generateUpdateError("entry"),
+      body: `An entry with the name ${name} already exists.`,
     });
   }
 }
