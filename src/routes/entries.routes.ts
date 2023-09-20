@@ -44,6 +44,7 @@ entriesRouter.post(
 const optionalEntryUpdateData: Validators.OptionalEntryUpdateData = [
   "name",
   "totalSpent",
+  "nonMonthlyTotalSpent",
   "budget",
   "logbookId",
   "overviewId",

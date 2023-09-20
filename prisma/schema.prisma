@@ -82,19 +82,20 @@ model Logbook {
 }
 
 model Entry {
-  id         Int        @id @default(autoincrement())
-  name       String
-  totalSpent Float      @default(0)
-  budget     Float?
-  createdAt  DateTime   @default(now())
-  updatedAt  DateTime   @updatedAt
+  id                   Int        @id @default(autoincrement())
+  name                 String
+  totalSpent           Float      @default(0)
+  nonMonthlyTotalSpent Float      @default(0)
+  budget               Float?
+  createdAt            DateTime   @default(now())
+  updatedAt            DateTime   @updatedAt
   // Belongs To
-  overview   Overview?  @relation(fields: [overviewId], references: [id], onDelete: Cascade)
-  overviewId Int?
-  logbook    Logbook?   @relation(fields: [logbookId], references: [id], onDelete: Cascade)
-  logbookId  Int?
+  overview             Overview?  @relation(fields: [overviewId], references: [id], onDelete: Cascade)
+  overviewId           Int?
+  logbook              Logbook?   @relation(fields: [logbookId], references: [id], onDelete: Cascade)
+  logbookId            Int?
   // Has Many
-  purchases  Purchase[]
+  purchases            Purchase[]
 }
 
 enum Category {

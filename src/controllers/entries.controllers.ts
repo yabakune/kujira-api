@@ -54,6 +54,7 @@ export function updateEntry(
     Number(request.params.entryId),
     request.body.name,
     request.body.totalSpent,
+    request.body.nonMonthlyTotalSpent,
     request.body.budget,
     request.body.overviewId,
     request.body.logbookId

@@ -20,6 +20,7 @@ const entryUpdateValidator = Prisma.validator<Prisma.EntryArgs>()({
   select: {
     name: true,
     totalSpent: true,
+    nonMonthlyTotalSpent: true,
     budget: true,
     overviewId: true,
     logbookId: true,

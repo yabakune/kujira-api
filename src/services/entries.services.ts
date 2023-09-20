@@ -164,6 +164,7 @@ export async function updateEntry(
   entryId: number,
   name?: string,
   totalSpent?: number,
+  nonMonthlyTotalSpent?: number,
   budget?: number | null,
   overviewId?: number | null,
   logbookId?: number | null
@@ -172,6 +173,7 @@ export async function updateEntry(
     const data: Validators.EntryUpdateValidator = {
       name,
       totalSpent,
+      nonMonthlyTotalSpent,
       budget,
       overviewId,
       logbookId,
