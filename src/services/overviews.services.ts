@@ -58,7 +58,7 @@ export async function fetchLogbookOverview(
   try {
     const overview = await prisma.overview.findUniqueOrThrow({
       where: { logbookId },
-      include: { entries: { select: { id: true } } },
+      include: { entries: { select: { id: true }, orderBy: { id: "asc" } } },
     });
 
     return response.status(Constants.HttpStatusCodes.OK).json(
