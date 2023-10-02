@@ -1,8 +1,8 @@
 import express from "express";
 
-import * as Controllers from "@/controllers";
-import * as Middleware from "@/middleware";
-import * as Validators from "@/validators";
+import * as Controllers from "../controllers";
+import * as Middleware from "../middleware";
+import * as Validators from "../validators";
 
 export const usersRouter = express.Router();
 

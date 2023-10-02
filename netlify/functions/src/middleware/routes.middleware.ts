@@ -2,8 +2,8 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 import { PrismaClient } from "@prisma/client";
 import { NextFunction, Request, Response } from "express";
 
-import * as Constants from "@/constants";
-import * as Helpers from "@/helpers";
+import * as Constants from "../constants";
+import * as Helpers from "../helpers";
 
 const prisma = new PrismaClient();
 

@@ -1,9 +1,9 @@
 import { PrismaClient } from "@prisma/client";
 import { Response } from "express";
 
-import * as Constants from "@/constants";
-import * as Helpers from "@/helpers";
-import * as Validators from "@/validators";
+import * as Constants from "../constants";
+import * as Helpers from "../helpers";
+import * as Validators from "../validators";
 
 const prisma = new PrismaClient();
 

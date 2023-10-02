@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
 
-import * as Constants from "@/constants";
-import * as Helpers from "@/helpers";
-import * as Services from "@/services";
-import * as Validators from "@/validators";
+import * as Constants from "../constants";
+import * as Helpers from "../helpers";
+import * as Services from "../services";
+import * as Validators from "../validators";
 
 export async function register(
   request: Request<{}, {}, Validators.RegistrationValidator>,

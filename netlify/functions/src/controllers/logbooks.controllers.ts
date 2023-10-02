@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 
-import * as Services from "@/services";
-import * as Validators from "@/validators";
+import * as Services from "../services";
+import * as Validators from "../validators";
 
 export function fetchLogbooks(_: Request, response: Response) {
   return Services.fetchLogbooks(response);
