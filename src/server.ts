@@ -5,7 +5,7 @@ import express, {
   Response,
 } from "express";
 import compression from "compression";
-// import cors from "cors";
+import cors from "cors";
 import dotenv from "dotenv";
 import helmet from "helmet";
 import { rateLimit } from "express-rate-limit";
@@ -14,12 +14,11 @@ import * as Constants from "./constants";
 import * as Routes from "./routes";
 // import { generateResponse } from "./helpers";
 import { validateAuthorizedUser } from "./middleware";
-import serverless from "serverless-http";
 
 dotenv.config();
 const app = express();
 
-// app.use(cors()); //Sets CORS for all routes.
+app.use(cors()); //Sets CORS for all routes.
 
 if (process.env.NODE_ENV === "production") {
   app.use(
@@ -73,5 +72,3 @@ const port = process.env.PORT || 8000;
 app.listen(port, () => {
   console.log(`🚀 Success! CORS-enabled web server is running on port:${port}`);
 });
-
-export const handler = serverless(app);

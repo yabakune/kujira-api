@@ -7,7 +7,7 @@
     "node": ">=19.4.0"
   },
   "private": true,
-  "main": "netlify/functions/src/api.ts",
+  "main": "server.ts",
   "nodemonConfig": {
     "ignore": [
       ".git",
@@ -18,13 +18,13 @@
     "watch": [
       "src"
     ],
-    "exec": "node -r tsconfig-paths/register -r ts-node/register ./netlify/functions/src/api.ts",
+    "exec": "node -r tsconfig-paths/register -r ts-node/register ./src/server.ts",
     "ext": "ts, js"
   },
   "scripts": {
     "dev": "nodemon",
     "build": "npx tsc --project tsconfig.json && tsc-alias -p tsconfig.json",
-    "start": "node dist/api.js",
+    "start": "node dist/server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
@@ -34,7 +34,6 @@
   ],
   "license": "ISC",
   "dependencies": {
-    "@netlify/functions": "^2.1.0",
     "@prisma/client": "^4.16.2",
     "bcrypt": "^5.1.0",
     "compression": "^1.7.4",
@@ -44,8 +43,7 @@
     "express-rate-limit": "^6.7.0",
     "helmet": "^7.0.0",
     "jsonwebtoken": "^9.0.1",
-    "nodemailer": "^6.9.3",
-    "serverless-http": "^3.2.0"
+    "nodemailer": "^6.9.3"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.0",
