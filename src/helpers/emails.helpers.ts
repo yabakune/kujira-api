@@ -35,11 +35,11 @@ export async function emailUser(
     const prodSMTPtransporter = nodemailer.createTransport({
       service: "hotmail",
       secure: false,
-      auth: {
-        user: process.env.EMAIL_HELP,
-        pass: process.env.EMAIL_PASSWORD,
-      },
       tls: { ciphers: "SSLv3" },
+      // auth: {
+      //   user: process.env.EMAIL_HELP,
+      //   pass: process.env.EMAIL_PASSWORD,
+      // },
     });
     prodSMTPtransporter.sendMail(
       message,
