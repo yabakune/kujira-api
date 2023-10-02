@@ -14,6 +14,7 @@ import * as Constants from "@/constants";
 import * as Routes from "@/routes";
 // import { generateResponse } from "./helpers";
 import { validateAuthorizedUser } from "@/middleware";
+import serverless from "serverless-http";
 
 dotenv.config();
 const app = express();
@@ -72,3 +73,5 @@ const port = process.env.PORT || 8000;
 app.listen(port, () => {
   console.log(`🚀 Success! CORS-enabled web server is running on port:${port}`);
 });
+
+export const handler = serverless(app);
