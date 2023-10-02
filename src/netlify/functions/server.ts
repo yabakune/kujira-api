@@ -18,7 +18,7 @@ import { validateAuthorizedUser } from "@/middleware";
 dotenv.config();
 const app = express();
 
-app.use(cors()); //Sets CORS for all routes.
+// app.use(cors()); //Sets CORS for all routes.
 
 if (process.env.NODE_ENV === "production") {
   app.use(
