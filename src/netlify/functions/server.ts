@@ -8,12 +8,12 @@ import compression from "compression";
 import cors from "cors";
 import dotenv from "dotenv";
 import helmet from "helmet";
-// import { rateLimit } from "express-rate-limit";
+import { rateLimit } from "express-rate-limit";
 
 import * as Constants from "@/constants";
 import * as Routes from "@/routes";
 // import { generateResponse } from "./helpers";
-import { validateAuthorizedUser } from "./middleware";
+import { validateAuthorizedUser } from "../../middleware";
 
 dotenv.config();
 const app = express();
@@ -23,14 +23,14 @@ app.use(helmet()); //Sets HTTP Headers to protect app from well-known web vulner
 app.use(compression()); // Compresses all routes.
 
 // ↓↓↓ Rate limits to a max of 20 requests per minute. ↓↓↓ //
-// if (process.env.NODE_ENV === "production") {
-//   app.use(
-//     rateLimit({
-//       windowMs: 1 * 60 * 1000, // one minute
-//       max: 20,
-//     })
-//   );
-// }
+if (process.env.NODE_ENV === "production") {
+  app.use(
+    rateLimit({
+      windowMs: 1 * 60 * 1000, // one minute
+      max: 20,
+    })
+  );
+}
 
 app.use(express.json()); // Allows API to parse client payload.
 
