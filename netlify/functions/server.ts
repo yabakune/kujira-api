@@ -5,7 +5,7 @@ import express, {
   Response,
 } from "express";
 import compression from "compression";
-import cors from "cors";
+// import cors from "cors";
 import dotenv from "dotenv";
 import helmet from "helmet";
 import { rateLimit } from "express-rate-limit";

@@ -18,7 +18,7 @@
     "watch": [
       "src"
     ],
-    "exec": "node -r tsconfig-paths/register -r ts-node/register ./src/netlify/functions/server.ts",
+    "exec": "node -r tsconfig-paths/register -r ts-node/register ./netlify/functions/server.ts",
     "ext": "ts, js"
   },
   "scripts": {
