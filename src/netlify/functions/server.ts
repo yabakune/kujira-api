@@ -18,19 +18,24 @@ import { validateAuthorizedUser } from "../../middleware";
 dotenv.config();
 const app = express();
 
-app.use(cors()); //Sets CORS for all routes.
-app.use(helmet()); //Sets HTTP Headers to protect app from well-known web vulnerabilities.
-app.use(compression()); // Compresses all routes.
-
-// ↓↓↓ Rate limits to a max of 20 requests per minute. ↓↓↓ //
 if (process.env.NODE_ENV === "production") {
+  const corsOptions: cors.CorsOptions = {
+    origin: "https://kujira-app.netlify.app/",
+    optionsSuccessStatus: 200,
+  };
+  app.use(cors(corsOptions));
   app.use(
     rateLimit({
-      windowMs: 1 * 60 * 1000, // one minute
+      windowMs: 1 * 60 * 1000, // max 20 requests per minute
       max: 20,
     })
   );
+} else {
+  app.use(cors()); //Sets CORS for all routes.
 }
+
+app.use(helmet()); //Sets HTTP Headers to protect app from well-known web vulnerabilities.
+app.use(compression()); // Compresses all routes.
 
 app.use(express.json()); // Allows API to parse client payload.
 
@@ -44,21 +49,12 @@ enum RouteBases {
   PURCHASES = "/api/v1/purchases",
   BUG_REPORTS = "/api/v1/bug-reports",
 }
-if (process.env.NODE_ENV === "production") {
-  app.use(RouteBases.AUTH, Routes.authRouter);
-  app.use(RouteBases.USERS, validateAuthorizedUser, Routes.usersRouter);
-  app.use(RouteBases.OVERVIEWS, validateAuthorizedUser, Routes.overviewsRouter);
-  app.use(RouteBases.LOGBOOKS, validateAuthorizedUser, Routes.logbooksRouter);
-  app.use(RouteBases.ENTRIES, validateAuthorizedUser, Routes.entriesRouter);
-  app.use(RouteBases.PURCHASES, validateAuthorizedUser, Routes.purchasesRouter);
-} else {
-  app.use(RouteBases.AUTH, Routes.authRouter);
-  app.use(RouteBases.USERS, Routes.usersRouter);
-  app.use(RouteBases.OVERVIEWS, Routes.overviewsRouter);
-  app.use(RouteBases.LOGBOOKS, Routes.logbooksRouter);
-  app.use(RouteBases.ENTRIES, Routes.entriesRouter);
-  app.use(RouteBases.PURCHASES, Routes.purchasesRouter);
-}
+app.use(RouteBases.AUTH, Routes.authRouter);
+app.use(RouteBases.USERS, validateAuthorizedUser, Routes.usersRouter);
+app.use(RouteBases.OVERVIEWS, validateAuthorizedUser, Routes.overviewsRouter);
+app.use(RouteBases.LOGBOOKS, validateAuthorizedUser, Routes.logbooksRouter);
+app.use(RouteBases.ENTRIES, validateAuthorizedUser, Routes.entriesRouter);
+app.use(RouteBases.PURCHASES, validateAuthorizedUser, Routes.purchasesRouter);
 
 // ↓↓↓ Fallback in case I forgot to catch an error somewhere. ↓↓↓ //
 const errorFallbackMiddleware: ErrorRequestHandler = (
@@ -79,7 +75,5 @@ app.use(errorFallbackMiddleware);
 
 const port = process.env.PORT || 8000;
 app.listen(port, () => {
-  console.log(
-    `🚀 Success! CORS-enabled web server is running at https://localhost:${port}`
-  );
+  console.log(`🚀 Success! CORS-enabled web server is running on port:${port}`);
 });
