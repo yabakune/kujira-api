@@ -13,25 +13,20 @@ import { rateLimit } from "express-rate-limit";
 import * as Constants from "@/constants";
 import * as Routes from "@/routes";
 // import { generateResponse } from "./helpers";
-import { validateAuthorizedUser } from "../../middleware";
+import { validateAuthorizedUser } from "@/middleware";
 
 dotenv.config();
 const app = express();
 
+app.use(cors()); //Sets CORS for all routes.
+
 if (process.env.NODE_ENV === "production") {
-  const corsOptions: cors.CorsOptions = {
-    origin: "https://kujira-app.netlify.app/",
-    optionsSuccessStatus: 200,
-  };
-  app.use(cors(corsOptions));
   app.use(
     rateLimit({
       windowMs: 1 * 60 * 1000, // max 20 requests per minute
       max: 20,
     })
   );
-} else {
-  app.use(cors()); //Sets CORS for all routes.
 }
 
 app.use(helmet()); //Sets HTTP Headers to protect app from well-known web vulnerabilities.

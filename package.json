@@ -23,8 +23,8 @@
   },
   "scripts": {
     "dev": "nodemon",
-    "build": "npx tsc",
-    "start": "node dist/server.ts",
+    "build": "npx tsc --project tsconfig.json && tsc-alias -p tsconfig.json",
+    "start": "node dist/netlify/functions/server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
@@ -56,6 +56,7 @@
     "nodemon": "^2.0.22",
     "prisma": "^4.16.2",
     "ts-node": "^10.9.1",
+    "tsc-alias": "^1.8.8",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.1.6"
   }
