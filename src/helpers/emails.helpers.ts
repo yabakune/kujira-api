@@ -1,4 +1,7 @@
+import dotenv from "dotenv";
 import nodemailer from "nodemailer";
+
+dotenv.config();
 
 export async function emailUser(
   targetEmailAddress: string,
@@ -33,13 +36,12 @@ export async function emailUser(
   // ↓↓↓ Production ↓↓↓ //
   else {
     const prodSMTPtransporter = nodemailer.createTransport({
-      service: "hotmail",
-      secure: false,
+      service: process.env.EMAIL_SERVICE,
       tls: { ciphers: "SSLv3" },
-      // auth: {
-      //   user: process.env.EMAIL_HELP,
-      //   pass: process.env.EMAIL_PASSWORD,
-      // },
+      auth: {
+        user: process.env.EMAIL_HELP,
+        pass: process.env.EMAIL_PASSWORD,
+      },
     });
     prodSMTPtransporter.sendMail(
       message,
