@@ -51,6 +51,7 @@ export async function fetchUser(response: Response, userId: number) {
   try {
     const user = await prisma.user.findUniqueOrThrow({
       where: { id: userId },
+      include: { logbooks: { select: { id: true }, orderBy: { id: "desc" } } },
     });
     const safeUser = Helpers.generateSafeUser(user);
 

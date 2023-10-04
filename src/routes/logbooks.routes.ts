@@ -22,7 +22,6 @@ logbooksRouter.post(
 );
 
 const requiredLogbookCreateData: Validators.RequiredLogbookCreateData = [
-  "name",
   "ownerId",
 ];
 logbooksRouter.post(

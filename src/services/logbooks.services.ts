@@ -78,30 +78,36 @@ export async function fetchUserLogbooks(response: Response, ownerId: number) {
   }
 }
 
-export async function createLogbook(
-  response: Response,
-  name: string,
-  ownerId: number
-) {
+export async function createLogbook(response: Response, ownerId: number) {
   try {
-    const data: Validators.RequiredLogbookCreateValidator = {
-      name,
-      ownerId,
-    };
+    const logbookName = Helpers.formatDateToName();
 
-    const logbook = await prisma.logbook.create({ data });
+    const logbook = await prisma.logbook.findFirst({
+      where: { name: logbookName },
+    });
 
-    return response.status(Constants.HttpStatusCodes.CREATED).json(
-      Helpers.generateResponse({
-        body: "Created logbook!",
-        response: logbook,
-      })
-    );
+    if (logbook) {
+      throw new Error();
+    } else {
+      const data: Validators.RequiredLogbookCreateValidator = {
+        name: logbookName,
+        ownerId,
+      };
+      const logbook = await prisma.logbook.create({ data });
+
+      return response.status(Constants.HttpStatusCodes.CREATED).json(
+        Helpers.generateResponse({
+          body: "Created logbook!",
+          response: logbook,
+        })
+      );
+    }
   } catch (error) {
     console.error(error);
     return response.status(Constants.HttpStatusCodes.BAD_REQUEST).json(
       Helpers.generateErrorResponse({
-        body: "Failed to create logbook." + Constants.Errors.CREATE_ERROR,
+        title: "Failed to create logbook.",
+        body: "A logbook for this month already exists.",
       })
     );
   }

@@ -21,15 +21,8 @@ export function fetchUserLogbooks(
   return Services.fetchUserLogbooks(response, request.body.ownerId);
 }
 
-export function createLogbook(
-  request: Request<{}, {}, Validators.RequiredLogbookCreateValidator>,
-  response: Response
-) {
-  return Services.createLogbook(
-    response,
-    request.body.name,
-    request.body.ownerId
-  );
+export function createLogbook(request: Request, response: Response) {
+  return Services.createLogbook(response, request.body.ownerId);
 }
 
 export function updateLogbook(
